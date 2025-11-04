@@ -364,7 +364,6 @@ em {
 
 .answer-content {
   font-family: Montserrat, sans-serif !important;
-  font-size: 12px !important;
   padding-left: 25px !important;
   transition: height 0.3s ease-in-out, padding 0.3s ease-in-out;
   overflow: hidden !important;
@@ -647,6 +646,7 @@ code {
 .collapsible-read {
 	background-color: #f6f3f1;
 	color: #130400;
+	font-weight: 600;
 	border-color: #bda89b;
 }
 .collapsible-read:hover,
