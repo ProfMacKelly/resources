@@ -5,263 +5,373 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Legal Decision Tree Deck</title>
 
-  <!-- Reveal.js (CDN) -->
+  <!-- Reveal.js -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/white.css">
 
   <style>
-    /* Optional: make Mermaid diagrams breathe on slides */
+    /* Layout helpers */
     .mermaid { font-size: 20px; }
-    .route-hint { font-size: 0.75em; opacity: 0.75; margin-top: 0.75rem; }
-    kbd {
-      border: 1px solid #888; border-bottom-width: 2px;
-      padding: 0.1rem 0.35rem; border-radius: 0.25rem;
+
+    /* Fixed UI overlay */
+    .overlay-ui {
+      position: fixed;
+      left: 0;
+      right: 0;
+      top: 0;
+      pointer-events: none;
+      z-index: 9999;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    .breadcrumbs {
+      pointer-events: auto;
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid rgba(0,0,0,0.12);
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(4px);
+      font-size: 14px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .crumb {
+      padding: 0.2rem 0.5rem;
+      border: 1px solid rgba(0,0,0,0.2);
+      border-radius: 999px;
+    }
+    .crumb .choice {
+      margin-left: 0.35rem;
+      font-weight: 600;
+    }
+
+    .controls {
+      position: fixed;
+      right: 0.75rem;
+      bottom: 0.75rem;
+      display: flex;
+      gap: 0.5rem;
+      pointer-events: auto;
+      z-index: 9999;
+    }
+
+    .btn {
+      border: 1px solid rgba(0,0,0,0.25);
+      border-bottom-width: 2px;
+      border-radius: 0.6rem;
+      padding: 0.5rem 0.75rem;
+      background: rgba(255,255,255,0.95);
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+      user-select: none;
+    }
+    .btn[disabled] {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .btn kbd {
+      display: inline-block;
+      border: 1px solid #888;
+      border-bottom-width: 2px;
+      padding: 0.05rem 0.3rem;
+      border-radius: 0.25rem;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
       font-size: 0.9em;
+      margin-left: 0.35rem;
     }
+
+    .route-hint { font-size: 0.75em; opacity: 0.75; margin-top: 0.75rem; }
+
+    /*
+      Auto-highlight mechanism:
+
+      In Mermaid code, mark nodes/edges you want to highlight by branch using:
+        class X yesPath;
+        class Y noPath;
+
+      This template toggles .chosen-yes or .chosen-no on the CURRENT slide container
+      when it is reached via a Y/N choice.
+    */
+
+    /* Node styling: Mermaid renders nodes as <g class="node ..."> containing shapes */
+    .chosen-yes svg .yesPath > * { stroke-width: 4px !important; }
+    .chosen-no  svg .noPath  > * { stroke-width: 4px !important; }
+
+    /* Edges are often <path class="edgePath ..."> or within <g class="edgePath ..."> */
+    .chosen-yes svg .edgePath.yesPath path { stroke-width: 4px !important; }
+    .chosen-no  svg .edgePath.noPath  path { stroke-width: 4px !important; }
+
+    /*
+      Optional: If you DO want color emphasis, uncomment these.
+      (Left off by default to avoid clashing with your existing styling.)
+    */
+    /*
+    .chosen-yes svg .yesPath > * { stroke: #1a73e8 !important; }
+    .chosen-no  svg .noPath  > * { stroke: #d93025 !important; }
+    .chosen-yes svg .yesPath rect, .chosen-yes svg .yesPath polygon { fill: rgba(26,115,232,0.10) !important; }
+    .chosen-no  svg .noPath  rect, .chosen-no  svg .noPath  polygon { fill: rgba(217,48,37,0.10) !important; }
+    */
   </style>
 </head>
 
 <body>
-<div class="reveal">
-  <div class="slides">
+  <!-- Overlay UI -->
+  <div class="overlay-ui">
+    <div id="breadcrumbs" class="breadcrumbs" aria-label="Branch history"></div>
+  </div>
 
-    <!-- 0) Title / Overview -->
-    <section id="start"
-      data-yn-disabled="true">
-      <h2>Legal Analysis Decision Tree</h2>
-      <p>Use <kbd>Y</kbd> / <kbd>N</kbd> on decision slides.</p>
-      <p class="route-hint">Press Space/→ to begin.</p>
-    </section>
+  <div class="controls" aria-label="Branch controls">
+    <button id="btnBack" class="btn" type="button" title="Back (B)">
+      Back <kbd>B</kbd>
+    </button>
+    <button id="btnNo" class="btn" type="button" title="No (N)">
+      No <kbd>N</kbd>
+    </button>
+    <button id="btnYes" class="btn" type="button" title="Yes (Y)">
+      Yes <kbd>Y</kbd>
+    </button>
+  </div>
 
-    <!-- 1) Decision slide: generic template (YES/NO) -->
-    <section id="Q1"
-      data-yes="Q1Y"
-      data-no="Q1N">
-      <h3>Decision Point</h3>
+  <div class="reveal">
+    <div class="slides">
 
-      <pre class="mermaid">
+      <!-- Title -->
+      <section id="start" data-label="Start" data-yn-disabled="true">
+        <h2>Legal Analysis Decision Tree</h2>
+        <p>Decision slides accept <strong>Y</strong>/<strong>N</strong> (and buttons). Use <strong>B</strong> to return to the last decision.</p>
+        <p class="route-hint">Press Space/→ to begin.</p>
+      </section>
+
+      <!-- Generic Decision Slide Template -->
+      <section id="Q1" data-label="Decision 1" data-yes="Q1Y" data-no="Q1N">
+        <h3>Decision Point</h3>
+
+        <pre class="mermaid">
 flowchart TD
-  A[Question: Is Element X satisfied?]
-  A -->|Yes| B[Proceed to next element]
-  A -->|No| C[Stop / alternate doctrine]
-      </pre>
+  A["Question: Is Element X satisfied?"]
+  A -->|Yes| B["Proceed to next element"]
+  A -->|No| C["Stop / alternate doctrine"]
 
-      <p class="route-hint">
-        Press <kbd>Y</kbd> for Yes branch • <kbd>N</kbd> for No branch
-      </p>
-    </section>
+  %% Mark branch-relevant nodes/edges for highlighting on the NEXT slide
+  class B yesPath;
+  class C noPath;
+        </pre>
 
-    <!-- 1Y) YES slide -->
-    <section id="Q1Y" data-yn-disabled="true">
-      <h3>Yes Branch</h3>
-      <p>Element X is satisfied. Continue.</p>
+        <p class="route-hint">Press <kbd>Y</kbd> or <kbd>N</kbd>.</p>
+      </section>
 
-      <pre class="mermaid">
+      <!-- YES target slide (will highlight yesPath if reached via Y) -->
+      <section id="Q1Y" data-label="Element X: Yes" data-yn-disabled="true" data-highlight="yes">
+        <h3>Yes Branch</h3>
+        <pre class="mermaid">
 flowchart TD
   B[Element X satisfied] --> D[Next decision point]
-      </pre>
+  class B yesPath;
+        </pre>
+      </section>
 
-      <p class="route-hint">Press → to continue.</p>
-    </section>
-
-    <!-- 1N) NO slide -->
-    <section id="Q1N" data-yn-disabled="true">
-      <h3>No Branch</h3>
-      <p>Element X is not satisfied. Consider an alternative pathway or end.</p>
-
-      <pre class="mermaid">
+      <!-- NO target slide (will highlight noPath if reached via N) -->
+      <section id="Q1N" data-label="Element X: No" data-yn-disabled="true" data-highlight="no">
+        <h3>No Branch</h3>
+        <pre class="mermaid">
 flowchart TD
   C[Element X not satisfied] --> E[End / Different claim]
-      </pre>
+  class C noPath;
+        </pre>
+      </section>
 
-      <p class="route-hint">Press ← to revisit or → to continue.</p>
-    </section>
-
-    <!-- 2) Example: Tort (Negligence) -->
-    <section id="TORT_DUTY"
-      data-yes="TORT_BREACH"
-      data-no="TORT_END_NO_DUTY">
-      <h3>Torts: Duty?</h3>
-      <pre class="mermaid">
+      <!-- Example: Torts (Negligence chain) -->
+      <section id="TORT_DUTY" data-label="Torts: Duty" data-yes="TORT_BREACH" data-no="TORT_END_NO_DUTY">
+        <h3>Torts: Duty?</h3>
+        <pre class="mermaid">
 flowchart TD
   A[Duty of care owed?] -->|Yes| B[Breach]
   A -->|No| C[No negligence liability]
-      </pre>
-      <p class="route-hint">Press <kbd>Y</kbd> or <kbd>N</kbd>.</p>
-    </section>
+  class B yesPath;
+  class C noPath;
+        </pre>
+      </section>
 
-    <section id="TORT_BREACH"
-      data-yes="TORT_CAUSE"
-      data-no="TORT_END_NO_BREACH">
-      <h3>Torts: Breach?</h3>
-      <pre class="mermaid">
+      <section id="TORT_BREACH" data-label="Torts: Breach" data-yes="TORT_CAUSE" data-no="TORT_END_NO_BREACH">
+        <h3>Torts: Breach?</h3>
+        <pre class="mermaid">
 flowchart TD
   A[Breach of duty?] -->|Yes| B[Causation]
   A -->|No| C[No negligence liability]
-      </pre>
-      <p class="route-hint">Press <kbd>Y</kbd> or <kbd>N</kbd>.</p>
-    </section>
+  class B yesPath;
+  class C noPath;
+        </pre>
+      </section>
 
-    <section id="TORT_CAUSE"
-      data-yes="TORT_DAMAGES"
-      data-no="TORT_END_NO_CAUSE">
-      <h3>Torts: Causation?</h3>
-      <pre class="mermaid">
+      <section id="TORT_CAUSE" data-label="Torts: Causation" data-yes="TORT_DAMAGES" data-no="TORT_END_NO_CAUSE">
+        <h3>Torts: Causation?</h3>
+        <pre class="mermaid">
 flowchart TD
   A[Cause-in-fact & proximate cause?] -->|Yes| B[Damages]
   A -->|No| C[No negligence liability]
-      </pre>
-      <p class="route-hint">Press <kbd>Y</kbd> or <kbd>N</kbd>.</p>
-    </section>
+  class B yesPath;
+  class C noPath;
+        </pre>
+      </section>
 
-    <section id="TORT_DAMAGES"
-      data-yes="TORT_END_LIABILITY"
-      data-no="TORT_END_NO_DAMAGES">
-      <h3>Torts: Damages?</h3>
-      <pre class="mermaid">
+      <section id="TORT_DAMAGES" data-label="Torts: Damages" data-yes="TORT_END_LIABILITY" data-no="TORT_END_NO_DAMAGES">
+        <h3>Torts: Damages?</h3>
+        <pre class="mermaid">
 flowchart TD
   A[Legally cognizable damages?] -->|Yes| B[Negligence liability]
   A -->|No| C[No negligence liability]
-      </pre>
-      <p class="route-hint">Press <kbd>Y</kbd> or <kbd>N</kbd>.</p>
-    </section>
+  class B yesPath;
+  class C noPath;
+        </pre>
+      </section>
 
-    <section id="TORT_END_LIABILITY" data-yn-disabled="true">
-      <h3>Torts Outcome</h3>
-      <p>All elements satisfied: negligence liability (subject to defenses).</p>
-    </section>
+      <section id="TORT_END_LIABILITY" data-label="Torts: Liability" data-yn-disabled="true">
+        <h3>Torts Outcome</h3>
+        <p>All elements satisfied: negligence liability (subject to defenses).</p>
+      </section>
+      <section id="TORT_END_NO_DUTY" data-label="Torts: No Duty" data-yn-disabled="true"><h3>Torts Outcome</h3><p>No duty → no negligence liability.</p></section>
+      <section id="TORT_END_NO_BREACH" data-label="Torts: No Breach" data-yn-disabled="true"><h3>Torts Outcome</h3><p>No breach → no negligence liability.</p></section>
+      <section id="TORT_END_NO_CAUSE" data-label="Torts: No Causation" data-yn-disabled="true"><h3>Torts Outcome</h3><p>No causation → no negligence liability.</p></section>
+      <section id="TORT_END_NO_DAMAGES" data-label="Torts: No Damages" data-yn-disabled="true"><h3>Torts Outcome</h3><p>No damages → no negligence liability.</p></section>
 
-    <section id="TORT_END_NO_DUTY" data-yn-disabled="true"><h3>Torts Outcome</h3><p>No duty → no negligence liability.</p></section>
-    <section id="TORT_END_NO_BREACH" data-yn-disabled="true"><h3>Torts Outcome</h3><p>No breach → no negligence liability.</p></section>
-    <section id="TORT_END_NO_CAUSE" data-yn-disabled="true"><h3>Torts Outcome</h3><p>No causation → no negligence liability.</p></section>
-    <section id="TORT_END_NO_DAMAGES" data-yn-disabled="true"><h3>Torts Outcome</h3><p>No damages → no negligence liability.</p></section>
-
-    <!-- 3) Example: Criminal law (Mens rea gate) -->
-    <section id="CRIM_MENSREA"
-      data-yes="CRIM_ACTUSREUS"
-      data-no="CRIM_END_NO_CRIME">
-      <h3>Criminal Law: Mens Rea?</h3>
-      <pre class="mermaid">
+      <!-- Example: Criminal law (Mens rea gate) -->
+      <section id="CRIM_MENSREA" data-label="Crim: Mens Rea" data-yes="CRIM_ACTUS" data-no="CRIM_END_NO_CRIME">
+        <h3>Criminal Law: Mens Rea?</h3>
+        <pre class="mermaid">
 flowchart TD
-  A[Required mens rea present?] -->|Yes| B[Actus reus + concurrence]
-  A -->|No| C[No crime (as charged)]
-      </pre>
-      <p class="route-hint">Press <kbd>Y</kbd> or <kbd>N</kbd>.</p>
-    </section>
+  A["Required mens rea present?"] -->|Yes| B["Actus reus + concurrence"]
+  A -->|No| C["No crime (as charged)"]
+  class B yesPath;
+  class C noPath;
+        </pre>
+      </section>
 
-    <section id="CRIM_ACTUSREUS"
-      data-yes="CRIM_DEFENSES"
-      data-no="CRIM_END_NO_CRIME">
-      <h3>Criminal Law: Actus Reus?</h3>
-      <pre class="mermaid">
+      <section id="CRIM_ACTUS" data-label="Crim: Actus Reus" data-yes="CRIM_DEF" data-no="CRIM_END_NO_CRIME">
+        <h3>Criminal Law: Actus Reus?</h3>
+        <pre class="mermaid">
 flowchart TD
-  A[Voluntary act / omission duty satisfied?] -->|Yes| B[Consider defenses]
-  A -->|No| C[No crime (as charged)]
-      </pre>
-      <p class="route-hint">Press <kbd>Y</kbd> or <kbd>N</kbd>.</p>
-    </section>
+  A["Voluntary act / omission duty satisfied?"] -->|Yes| B[Consider defenses]
+  A -->|No| C["No crime (as charged)"]
+  class B yesPath;
+  class C noPath;
+        </pre>
+      </section>
 
-    <section id="CRIM_DEFENSES"
-      data-yes="CRIM_END_ACQUITTAL"
-      data-no="CRIM_END_GUILTY_POSSIBLE">
-      <h3>Criminal Law: Complete Defense?</h3>
-      <pre class="mermaid">
+      <section id="CRIM_DEF" data-label="Crim: Defenses" data-yes="CRIM_END_ACQUIT" data-no="CRIM_END_LIAB">
+        <h3>Criminal Law: Complete Defense?</h3>
+        <pre class="mermaid">
 flowchart TD
-  A[Complete defense proven?] -->|Yes| B[Acquittal]
+  A["Complete defense proven?"] -->|Yes| B[Acquittal]
   A -->|No| C[Liability possible]
-      </pre>
-      <p class="route-hint">Press <kbd>Y</kbd> or <kbd>N</kbd>.</p>
-    </section>
+  class B yesPath;
+  class C noPath;
+        </pre>
+      </section>
 
-    <section id="CRIM_END_NO_CRIME" data-yn-disabled="true"><h3>Criminal Outcome</h3><p>Element missing → no crime (as charged).</p></section>
-    <section id="CRIM_END_ACQUITTAL" data-yn-disabled="true"><h3>Criminal Outcome</h3><p>Complete defense → acquittal.</p></section>
-    <section id="CRIM_END_GUILTY_POSSIBLE" data-yn-disabled="true"><h3>Criminal Outcome</h3><p>Elements satisfied and no complete defense → liability possible.</p></section>
+      <section id="CRIM_END_NO_CRIME" data-label="Crim: No Crime" data-yn-disabled="true"><h3>Criminal Outcome</h3><p>Element missing → no crime (as charged).</p></section>
+      <section id="CRIM_END_ACQUIT" data-label="Crim: Acquittal" data-yn-disabled="true"><h3>Criminal Outcome</h3><p>Complete defense → acquittal.</p></section>
+      <section id="CRIM_END_LIAB" data-label="Crim: Liability" data-yn-disabled="true"><h3>Criminal Outcome</h3><p>Elements satisfied and no complete defense → liability possible.</p></section>
 
-    <!-- 4) Example: Constitutional analysis (government action gate) -->
-    <section id="CONLAW_STATEACTION"
-      data-yes="CONLAW_STANDARD"
-      data-no="CONLAW_END_PRIVATE">
-      <h3>Constitutional Law: State Action?</h3>
-      <pre class="mermaid">
+      <!-- Example: Constitutional analysis (State action gate) -->
+      <section id="CON_STATE" data-label="Con Law: State Action" data-yes="CON_STANDARD" data-no="CON_END_PRIVATE">
+        <h3>Constitutional Law: State Action?</h3>
+        <pre class="mermaid">
 flowchart TD
-  A[Government / state action?] -->|Yes| B[Select standard of review]
+  A["Government / state action?"] -->|Yes| B[Select standard of review]
   A -->|No| C[Constitution typically not implicated]
-      </pre>
-      <p class="route-hint">Press <kbd>Y</kbd> or <kbd>N</kbd>.</p>
-    </section>
+  class B yesPath;
+  class C noPath;
+        </pre>
+      </section>
 
-    <section id="CONLAW_STANDARD"
-      data-yes="CONLAW_APPLY"
-      data-no="CONLAW_APPLY">
-      <h3>Constitutional Law: Standard of Review Chosen?</h3>
-      <pre class="mermaid">
+      <section id="CON_STANDARD" data-label="Con Law: Standard" data-yes="CON_APPLY" data-no="CON_APPLY">
+        <h3>Constitutional Law: Standard of Review Chosen?</h3>
+        <pre class="mermaid">
 flowchart TD
-  A[Pick standard: rational basis / intermediate / strict?] --> B[Apply test]
-      </pre>
-      <p class="route-hint">Use → to proceed. (You can create Y/N here too if you want.)</p>
-    </section>
+  A["Pick standard: rational basis / intermediate / strict"] --> B[Apply test]
+  class B yesPath;
+        </pre>
+        <p class="route-hint">Use → to proceed (or map Y/N to alternatives if you want).</p>
+      </section>
 
-    <section id="CONLAW_APPLY"
-      data-yes="CONLAW_END_UPHELD"
-      data-no="CONLAW_END_STRUCK">
-      <h3>Constitutional Law: Test Satisfied?</h3>
-      <pre class="mermaid">
+      <section id="CON_APPLY" data-label="Con Law: Apply Test" data-yes="CON_END_UPHELD" data-no="CON_END_STRUCK">
+        <h3>Constitutional Law: Test Satisfied?</h3>
+        <pre class="mermaid">
 flowchart TD
-  A[Government meets burden under chosen test?] -->|Yes| B[Law upheld]
-  A -->|No| C[Law struck / relief granted]
-      </pre>
-      <p class="route-hint">Press <kbd>Y</kbd> or <kbd>N</kbd>.</p>
-    </section>
+  A["Government meets burden under test?"] -->|Yes| B[Law upheld]
+  A -->|No| C["Law struck / relief granted"]
+  class B yesPath;
+  class C noPath;
+        </pre>
+      </section>
 
-    <section id="CONLAW_END_PRIVATE" data-yn-disabled="true"><h3>Con Law Outcome</h3><p>No state action → constitutional claim usually fails.</p></section>
-    <section id="CONLAW_END_UPHELD" data-yn-disabled="true"><h3>Con Law Outcome</h3><p>Test satisfied → law upheld.</p></section>
-    <section id="CONLAW_END_STRUCK" data-yn-disabled="true"><h3>Con Law Outcome</h3><p>Test not satisfied → law struck / remedy.</p></section>
+      <section id="CON_END_PRIVATE" data-label="Con Law: No State Action" data-yn-disabled="true"><h3>Con Law Outcome</h3><p>No state action → constitutional claim usually fails.</p></section>
+      <section id="CON_END_UPHELD" data-label="Con Law: Upheld" data-yn-disabled="true"><h3>Con Law Outcome</h3><p>Test satisfied → law upheld.</p></section>
+      <section id="CON_END_STRUCK" data-label="Con Law: Struck" data-yn-disabled="true"><h3>Con Law Outcome</h3><p>Test not satisfied → law struck / remedy.</p></section>
 
+    </div>
   </div>
-</div>
 
-<!-- Reveal.js + Mermaid -->
-<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/notes/notes.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/notes/notes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 
-<script>
-  // 1) Initialize Mermaid (render diagrams inside <pre class="mermaid">)
-  mermaid.initialize({
-    startOnLoad: false,
-    securityLevel: "loose"
-  });
+  <script>
+    /*******************************
+     * STORAGE KEYS
+     *******************************/
+    const KEY_HISTORY = "ldt_history";      // array of { fromId, fromLabel, choice, toId, toLabel }
+    const KEY_LAST_ROUTE = "ldt_last_route"; // { fromId, choice, toId }
 
-  // 2) Initialize Reveal
-  const deck = new Reveal({
-    hash: true,
-    plugins: [ RevealNotes ]
-  });
+    function loadHistory() {
+      try { return JSON.parse(sessionStorage.getItem(KEY_HISTORY)) ?? []; }
+      catch { return []; }
+    }
+    function saveHistory(hist) {
+      sessionStorage.setItem(KEY_HISTORY, JSON.stringify(hist));
+    }
+    function setLastRoute(route) {
+      sessionStorage.setItem(KEY_LAST_ROUTE, JSON.stringify(route));
+    }
+    function getLastRoute() {
+      try { return JSON.parse(sessionStorage.getItem(KEY_LAST_ROUTE)); }
+      catch { return null; }
+    }
 
-  deck.initialize().then(() => {
-    // Render Mermaid after Reveal is ready so diagrams layout correctly
-    renderMermaidOnCurrentAndAdjacent();
-  });
+    /*******************************
+     * MERMAID + REVEAL INIT
+     *******************************/
+    mermaid.initialize({ startOnLoad: false, securityLevel: "loose" });
 
-  // Re-render on slide changes (ensures Mermaid renders when slide becomes visible)
-  deck.on("slidechanged", () => {
-    renderMermaidOnCurrentAndAdjacent();
-  });
+    const deck = new Reveal({
+      hash: true,
+      plugins: [ RevealNotes ]
+    });
 
-  function renderMermaidOnCurrentAndAdjacent() {
-    // Render current slide and near neighbors for smoother navigation
-    const indices = [
-      deck.getIndices().h,
-      deck.getIndices().h - 1,
-      deck.getIndices().h + 1
-    ];
+    deck.initialize().then(() => {
+      renderMermaidVisible();
+      updateUIForSlide(deck.getCurrentSlide());
+      renderBreadcrumbs();
+      applyAutoHighlight(deck.getCurrentSlide());
+    });
 
-    indices.forEach(h => {
-      const slide = deck.getSlide(h, 0);
+    deck.on("slidechanged", (ev) => {
+      renderMermaidVisible();
+      updateUIForSlide(ev.currentSlide);
+      renderBreadcrumbs();
+      applyAutoHighlight(ev.currentSlide);
+    });
+
+    function renderMermaidVisible() {
+      // Render Mermaid blocks on the current slide only (fast + reliable).
+      const slide = deck.getCurrentSlide();
       if (!slide) return;
 
-      // Render any unrendered Mermaid blocks on that slide
       const blocks = slide.querySelectorAll("pre.mermaid:not([data-rendered='true'])");
       blocks.forEach(async (block) => {
         const code = block.textContent;
@@ -272,57 +382,156 @@ flowchart TD
           const container = document.createElement("div");
           container.innerHTML = svg;
 
-          // Replace <pre> with rendered SVG
           block.replaceWith(container);
           container.setAttribute("data-rendered", "true");
         } catch (e) {
-          // If Mermaid fails, keep the code visible for debugging
           console.error("Mermaid render error:", e);
         }
       });
-    });
-  }
+    }
 
-  // 3) YES/NO keyboard router
-  // On a slide with data-yes="SomeSlideId" and data-no="OtherSlideId":
-  // - pressing Y jumps to SomeSlideId
-  // - pressing N jumps to OtherSlideId
-  document.addEventListener("keydown", (ev) => {
-    const key = ev.key.toLowerCase();
-    if (key !== "y" && key !== "n") return;
+    /*******************************
+     * DECISION ROUTER (Y/N + buttons)
+     *******************************/
+    const btnYes = document.getElementById("btnYes");
+    const btnNo  = document.getElementById("btnNo");
+    const btnBack = document.getElementById("btnBack");
 
-    const current = deck.getCurrentSlide();
-    if (!current) return;
+    btnYes.addEventListener("click", () => route("yes"));
+    btnNo.addEventListener("click", () => route("no"));
+    btnBack.addEventListener("click", () => goBackToLastDecision());
 
-    // Allow opt-out for non-decision slides
-    if (current.dataset.ynDisabled === "true") return;
+    document.addEventListener("keydown", (ev) => {
+      const k = ev.key.toLowerCase();
+      if (k === "y") { ev.preventDefault(); route("yes"); }
+      if (k === "n") { ev.preventDefault(); route("no"); }
+      if (k === "b") { ev.preventDefault(); goBackToLastDecision(); }
+    }, true);
 
-    const targetId = (key === "y") ? current.dataset.yes : current.dataset.no;
-    if (!targetId) return;
+    function isDecisionSlide(slide) {
+      if (!slide) return false;
+      if (slide.dataset.ynDisabled === "true") return false;
+      return !!(slide.dataset.yes && slide.dataset.no);
+    }
 
-    // Prevent interfering with Reveal's built-in keybindings
-    ev.preventDefault();
-    ev.stopPropagation();
+    function updateUIForSlide(slide) {
+      const decision = isDecisionSlide(slide);
+      btnYes.disabled = !decision;
+      btnNo.disabled  = !decision;
 
-    // Jump by slide id
-    deck.slide(document.getElementById(targetId).getAttribute("data-index-h") ?? null);
+      // Back is enabled if there is at least one breadcrumb entry.
+      btnBack.disabled = loadHistory().length === 0;
+    }
 
-    // More reliable: use location hash navigation by id
-    // Reveal supports #/slideId when hash:true
-    window.location.hash = "#/" + targetId;
-  }, true);
+    function getSlideLabelById(id) {
+      const el = document.getElementById(id);
+      if (!el) return id;
+      return el.dataset.label || id;
+    }
 
-  // 4) Optional: annotate slides with their horizontal index for direct deck.slide usage
-  // This helps if you prefer deck.slide(h,v) instead of hash navigation.
-  deck.on("ready", () => indexSlidesById());
-  deck.on("slidechanged", () => indexSlidesById());
+    function route(choice) {
+      const slide = deck.getCurrentSlide();
+      if (!isDecisionSlide(slide)) return;
 
-  function indexSlidesById() {
-    const all = document.querySelectorAll(".reveal .slides > section[id]");
-    all.forEach((sec, idx) => {
-      sec.setAttribute("data-index-h", idx);
-    });
-  }
-</script>
+      const fromId = slide.id;
+      const fromLabel = slide.dataset.label || fromId;
+
+      const toId = (choice === "yes") ? slide.dataset.yes : slide.dataset.no;
+      if (!toId || !document.getElementById(toId)) return;
+
+      const toLabel = getSlideLabelById(toId);
+
+      // Persist route + breadcrumbs
+      const hist = loadHistory();
+      hist.push({ fromId, fromLabel, choice, toId, toLabel });
+      saveHistory(hist);
+
+      setLastRoute({ fromId, choice, toId });
+
+      // Navigate by id (Reveal hash navigation)
+      window.location.hash = "#/" + toId;
+    }
+
+    /*******************************
+     * BREADCRUMBS / HISTORY
+     *******************************/
+    function renderBreadcrumbs() {
+      const bc = document.getElementById("breadcrumbs");
+      const hist = loadHistory();
+
+      // Always show a small header (useful for students)
+      bc.innerHTML = "";
+
+      const title = document.createElement("span");
+      title.style.fontWeight = "600";
+      title.textContent = "Path:";
+      bc.appendChild(title);
+
+      if (hist.length === 0) {
+        const empty = document.createElement("span");
+        empty.style.opacity = "0.7";
+        empty.style.marginLeft = "0.5rem";
+        empty.textContent = "—";
+        bc.appendChild(empty);
+        return;
+      }
+
+      hist.forEach((h) => {
+        const pill = document.createElement("span");
+        pill.className = "crumb";
+        pill.textContent = h.fromLabel;
+
+        const ch = document.createElement("span");
+        ch.className = "choice";
+        ch.textContent = (h.choice === "yes") ? "Y" : "N";
+        pill.appendChild(ch);
+
+        bc.appendChild(pill);
+      });
+    }
+
+    /*******************************
+     * BACK TO LAST DECISION (B)
+     *******************************/
+    function goBackToLastDecision() {
+      const hist = loadHistory();
+      if (hist.length === 0) return;
+
+      const last = hist.pop();     // remove last branch decision
+      saveHistory(hist);           // persist new history
+      sessionStorage.removeItem(KEY_LAST_ROUTE); // clear route highlight intent
+
+      // Navigate back to the decision slide we branched from
+      if (last?.fromId && document.getElementById(last.fromId)) {
+        window.location.hash = "#/" + last.fromId;
+      }
+
+      renderBreadcrumbs();
+      btnBack.disabled = hist.length === 0;
+    }
+
+    /*******************************
+     * AUTO-HIGHLIGHT CHOSEN BRANCH
+     *******************************/
+    function applyAutoHighlight(slide) {
+      if (!slide) return;
+
+      // Clear prior highlight classes on this slide
+      slide.classList.remove("chosen-yes", "chosen-no");
+
+      // If we arrived here from a decision via Y/N, highlight accordingly
+      const route = getLastRoute();
+      if (!route) return;
+
+      if (route.toId !== slide.id) return;
+
+      if (route.choice === "yes") slide.classList.add("chosen-yes");
+      if (route.choice === "no")  slide.classList.add("chosen-no");
+
+      // Important: keep last route so subsequent non-decision navigation still reflects arrival.
+      // If you want highlight to apply only once, uncomment:
+      // sessionStorage.removeItem(KEY_LAST_ROUTE);
+    }
+  </script>
 </body>
 </html>
