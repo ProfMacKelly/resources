@@ -530,24 +530,42 @@ flowchart TD
     btnNo.addEventListener("click", () => route("no"));
     btnBack.addEventListener("click", () => goBackToLastDecision());
     btnSummary.addEventListener("click", () => gotoSummary());
-    btnDownloadDeck.addEventListener("click", () => downloadDeck());
-    btnCopyDeck.addEventListener("click", () => copyDeckHtml());
+    if (btnDownloadDeck) btnDownloadDeck.addEventListener("click", () => downloadDeck());
+    if (btnCopyDeck) btnCopyDeck.addEventListener("click", () => copyDeckHtml());
 
     document.addEventListener("keydown", (ev) => {
+      const target = ev.target;
+      const tag = target?.tagName?.toLowerCase();
+      const isFormField = tag === "input" || tag === "textarea" || tag === "select" || target?.isContentEditable;
+      if (isFormField) return;
+
       const k = ev.key.toLowerCase();
-      if (k === "y") { ev.preventDefault(); route("yes"); }
-      if (k === "n") { ev.preventDefault(); route("no"); }
-      if (k === "b") { ev.preventDefault(); goBackToLastDecision(); }
-      if (k === "s") { ev.preventDefault(); gotoSummary(); }
-      if (k === "d") { ev.preventDefault(); downloadDeck(); }
-      if (k === "c") { ev.preventDefault(); copyDeckHtml(); }  
+      const stop = () => { ev.preventDefault(); ev.stopPropagation(); };
+
+      if (k === "y") { stop(); route("yes"); return; }
+      if (k === "n") { stop(); route("no"); return; }
+      if (k === "b") { stop(); goBackToLastDecision(); return; }
+      if (k === "s") { stop(); gotoSummary(); return; }
+      if (k === "x") { stop(); toggleBlackout(); return; }
+      if (k === "d") { stop(); downloadDeck(); return; }
+      if (k === "c") { stop(); copyDeckHtml(); return; }
     }, true);
 
     function gotoSummary() {
       window.location.hash = "#/SUMMARY";
     }
 
+    function toggleBlackout() {
+      // Mirror Reveal.js pause/blank toggle (default on "B"), but mapped to "X" here.
+      deck.togglePause();
+    }
+
     async function copyDeckHtml() {
+      if (!btnCopyDeck) {
+        console.warn("Copy deck button is not present in the DOM.");
+        return;
+      }
+
       const originalLabel = btnCopyDeck.innerHTML;
       const html = "<!doctype html>\n" + document.documentElement.outerHTML;
 
