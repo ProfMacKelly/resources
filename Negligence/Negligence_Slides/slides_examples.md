@@ -627,25 +627,3 @@ class: text-center
 # Learn More
 
 [Documentation](https://sli.dev) · [GitHub](https://github.com/slidevjs/slidev) · [Showcases](https://sli.dev/resources/showcases)
-
-<PoweredBySlidev mt-10 />
-
-<script setup>
-import { ref, computed } from 'vue'
-import { onKeyStroke } from '@vueuse/core'
-
-const isBlackedOut = ref(false)
-
-const toggleBlackout = () => {
-  isBlackedOut.value = !isBlackedOut.value
-}
-
-// Keyboard shortcut 'B' for Blackout
-onKeyStroke(['b', 'B'], (e) => {
-  e.preventDefault()
-  toggleBlackout()
-})
-
-// Calculate the width of the progress bar as a percentage
-const progress = computed(() => ($nav.currentPage / $nav.total) * 100)
-</script>
