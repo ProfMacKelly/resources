@@ -1,6 +1,7 @@
 {
-  "slidev.include": [
-    "**/*.slides.md",
-    "**/*.slidev.md"
-  ]
+    "slidev.include": [
+        "**/slides.md",
+        "slidev/decks/negligence.slidev.md"
+    ]
+
 }

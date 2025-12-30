@@ -1,0 +1,7 @@
+{
+  "slidev.include": [
+    "decks/**/*.slides.md",
+    "decks/**/*.slidev.md"
+  ],
+  "slidev.dev-command": "pnpm run dev -- ${args}"
+}
