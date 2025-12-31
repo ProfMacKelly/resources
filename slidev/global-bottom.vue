@@ -26,8 +26,10 @@ const toggleBlackout = (e?: Event) => {
 const aliasToIndex = ref<Record<string, number>>({
   start: 1,
   overview: 2,
-  overview_map: 3,
+  overview_flowchart: 3,
   breach: 4,
+  causation: 9,
+  damages: 10,
 })
 
 // Build alias map by resolving numeric routes
@@ -129,7 +131,7 @@ watch(currentSlideRoute, (route) => {
     <div>Slide: {{ currentPage }} / {{ total }}</div>
   </div>
 
-  <div class="fixed bottom-8 right-8 flex items-center gap-6 z-[1000] pointer-events-none">
+  <div class="fixed bottom-2 right-2 flex items-center gap-6 z-[1000] pointer-events-none">
     <div class="flex items-center gap-4 pointer-events-auto bg-white/80 backdrop-blur p-2 rounded-lg border border-gray-200 shadow-sm">
       <button
         @click.stop="resetPresentation"

@@ -14,7 +14,7 @@ const counter = ref(props.count)
   <div flex="~" w="min" border="~ main rounded-md">
     <button
       border="r main"
-      p="2"
+      p=""
       font="mono"
       outline="!none"
       hover:bg="gray-400 opacity-20"

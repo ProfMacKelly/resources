@@ -1,0 +1,8 @@
+.slidev-page,
+.slidev-layout {
+  overflow: visible !important;
+}
+/* Hide Slidev's built-in slide counter */
+.slidev-nav-controls .slidev-page-number {
+  display: none !important;
+}
