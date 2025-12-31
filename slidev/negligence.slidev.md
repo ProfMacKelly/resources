@@ -48,11 +48,13 @@ alias: overview
 </v-clicks>
 
 ---
-class: -mt-5
 alias: overview_flowchart
+class: -mt--45
 ---
 
-### Overview Flowchart
+<Transform :scale="2.0" origin="left">
+
+Overview Flowchart
 <br>
 
 ```mermaid 
@@ -60,6 +62,7 @@ flowchart TB
     start["**START HERE**"] --> du["**Element: Duty**<br>Did D owe a<br/>**legal duty** to P?"]
     du -- **No** --> not_liab["**STOP:<br>Not Liable**"]
     du -- **Yes** --> da["**Element: Damages**<br>Did P suffer **damages** (aka harm, injury, loss)?"]
+    click du "/presenter/6/" "Go to Duty"
     da -- **No** --> not_liab
     da -- **Yes** --> br["**Element: Breach**<br>Did D **breach** their duty?"]
     br -- **No** --> not_liab
@@ -78,45 +81,78 @@ flowchart TB
     style liable stroke-width:2.5px,fill:#ebf5eb,stroke:#2c5e36
     style pf stroke-width:2.5px,fill:#e1f5fe,stroke:#01579b
 ```
+</Transform>
 
+---
+---
 
+---
+class: -mt-5
+alias: duties
 ---
 
 ### When is there a duty?
 
 <v-clicks>
 
-1. **_Prima Facie_ Case for Liability**  
-   > **Note:** "*prima facie* case" means: <br>
-   > **(a)** P has alleged sufficient evidence to support a claim at **face value**, and <br>
-   > **(b)** P's evidence is rebuttable by defenses.
+1. **Foreseeability**  
+   - Common law duty to avoid causing foreseeable harm to others
 
-   - **Duty** (to others)
-   - **Breach** (of duty)
-   - **Damages** (suffered by another)
-   - **Causation** (of damages)
+2. **On the Premises**
+   - Owners/Possessors of a premises owe special duty to warn
 
-2. **Defenses to Liability**
-   - Failure of Proof
-   - Affirmative Defenses
+3. **Special Relationships**
+   - Special duties owed to certain relationship counterparts
+
+4. **Creation of Risk**
+   - Duty created when person creates a risk to others
+
+5. **Assumption of Duty**
+   - Duty exists when person assumes a duty that didn't previously exist
+
+6. **Contract**
+   - Contracts create duties between the contracting parties
 
 </v-clicks>
 
 ---
+class: -mt--20
+---
 
-# When is there a duty?
+<Transform :scale="2.2" origin="left">
 
 ```mermaid
-flowchart TB 
-    start["**START HERE**"] --> du["**Element: Duty**<br>Did D owe a<br/>**legal duty** to P?"]
-    du -- **No** --> not_liab["**STOP:<br>Not Liable**"]
-    du -- **Yes** --> da["**Element: Damages**<br>Did P suffer **damages** (aka harm, injury, loss)?"]
-    
+flowchart LR 
+    start["**START HERE**"] --> du["Did D owe a<br/>**legal duty** to P?"]
+    du --> du1["Was there a **foreseeable** harm to P"]
+    du --> du2["Did D own/possess a **premises** relevant to the circumstances?"]
+    du --> du3["Did did and P have a **special relationship**?"]
+    du --> du4["Did D **create** a risk**?"]
+    du --> du5["Did D **assume a duty**?"]
+    du --> du6["Did D have a **contract**?"]
+    du1 --> yes-no["Were any of <br>the answers **yes**?"]
+    du2 --> yes-no
+    du3 --> yes-no
+    du4 --> yes-no
+    du5 --> yes-no
+    du6 --> yes-no
+    yes-no -- **No** --> no_du["**STOP:<br>D did not have<br>a duty to P**"]
+    yes-no -- **Yes** --> duty["**D had a duty to P; <br><br>Move to Damages**"]
+    click duty "/presenter/3/" "Go to Overview Flowchart"
+
+
+
+
     start@{ shape: terminal}
-    not_liab@{ shape: terminal}
+    no_du@{ shape: terminal}
+    duty@{ shape: diamond}
     style start stroke-width:2.5px,stroke-dasharray: 2,fill:#fafafa,stroke:#000000
-    style not_liab stroke-width:2.5px,fill:#FFF8F8,stroke:#880101
+    style no_du stroke-width:2.5px,fill:#FFF8F8,stroke:#880101
+    style yes-no stroke-width:2.5px,fill:#e1f5fe,stroke:#01579b
+    style duty stroke-width:2.5px,fill:#ebf5eb,stroke:#2c5e36
 ```
+</Transform>
+
 ---
 ---
 # When is there a duty?

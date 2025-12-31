@@ -27,9 +27,11 @@ const aliasToIndex = ref<Record<string, number>>({
   start: 1,
   overview: 2,
   overview_flowchart: 3,
-  breach: 4,
-  causation: 9,
-  damages: 10,
+  duty_overview: 5,
+  duty_flowchart: 6,
+  breach: 20,
+  causation: 21,
+  damages: 22,
 })
 
 // Build alias map by resolving numeric routes
