@@ -12,7 +12,9 @@
     "@slidev/cli": "^52.11.0",
     "@slidev/theme-default": "latest",
     "@slidev/theme-seriph": "latest",
-    "vue": "^3.5.25"
+    "@vueuse/core": "^14.1.0",
+    "vue": "^3.5.25",
+    "vue-router": "^4.6.4"
   },
   "devDependencies": {
     "@unocss/transformer-directives": "^66.5.10",
