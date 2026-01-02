@@ -119,10 +119,6 @@ watch(currentSlideRoute, (route) => {
 
 <template>
   
-    <div class="fixed top-0 left-0 z-[99999] bg-red-600 text-white text-xs px-2 py-1">
-    global-bottom.vue LOADED
-  </div>
-  
   <div v-if="decisionHistory.length > 0" class="fixed top-0 left-0 p-3 z-50 flex gap-2 pointer-events-none">
     <div
       v-for="(step, i) in decisionHistory"
@@ -197,9 +193,5 @@ watch(currentSlideRoute, (route) => {
     <p class="text-white/30 uppercase tracking-widest text-sm font-bold">Paused</p>
   </div>
 
-    <!-- PresenterZoom: global (every slide) -->
-  <div class="pointer-events-none">
-    <PresenterZoom />
-  </div>
 
 </template>
