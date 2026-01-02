@@ -1,3 +1,6 @@
+<script setup>
+console.log('PresenterZoom mounted')
+</script>
 <!-- components/PresenterZoom.vue -->
 <template>
   <div class="relative w-full h-full overflow-visible">
@@ -104,3 +107,5 @@ const styleObj = computed(() => {
   } as Record<string, string>
 })
 </script>
+
+

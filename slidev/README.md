@@ -6,6 +6,6 @@ To start the slide show:
 - `pnpm dev`
 - visit <http://localhost:3030>
 
-Edit the [slides.md](./negligence.slidev.md) to see the changes.
+Edit the [slides.md](./courses/bus-law/torts/negligence/negligence.slidev.md) to see the changes.
 
 Learn more about Slidev at the [documentation](https://sli.dev/).
