@@ -1,9 +1,10 @@
 <!-- components/PresenterZoom.vue -->
 <template>
   <div class="relative w-full h-full overflow-visible">
-    <!-- Debug badge -->
+    <!-- Show the keyboard-hints overlay ONLY in Presenter View -->
     <div
-      class="fixed right-0 top-0 z-50 rounded px-1 py-1 text-xs bg-black/60 text-white select-none"
+      v-if="isPresenter"
+      class="fixed right-0 top-0 z-50 rounded px-1 py-1 text-xs bg-black/60 text-white select-none pointer-events-none"
     >
       <span class="ml-0 opacity-80">(+/- , Shift+Arrows, 0)</span>
     </div>
@@ -17,6 +18,9 @@
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useNav } from '@slidev/client'
+
+const { isPresenter } = useNav()
 
 const scale = ref(1)
 const panX = ref(0)
@@ -29,10 +33,6 @@ function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n))
 }
 
-function isPresenter() {
-  return location.pathname.includes('/presenter')
-}
-
 function isTypingTarget(el: EventTarget | null) {
   const t = el as HTMLElement | null
   if (!t) return false
@@ -41,23 +41,23 @@ function isTypingTarget(el: EventTarget | null) {
 }
 
 function onKeydown(e: KeyboardEvent) {
-  if (!isPresenter()) return
+  // Zoom/pan hotkeys should only work in Presenter View
+  if (!isPresenter.value) return
   if (isTypingTarget(e.target)) return
 
-  
   let handled = false
 
-  // Zoom
-  if (e.key === '=') {
-    scale.value = clamp(scale.value + zoomStep, 0.5, 3)
+  // Zoom: +/-
+  if (e.key === '+' || e.key === '=') {
+    scale.value = clamp(scale.value + zoomStep, 0.2, 5)
     handled = true
   }
-  if (e.key === '-') {
-    scale.value = clamp(scale.value - zoomStep, 0.5, 3)
+  if (e.key === '-' || e.key === '_') {
+    scale.value = clamp(scale.value - zoomStep, 0.2, 5)
     handled = true
   }
 
-  // Reset
+  // Reset: 0
   if (e.key === '0') {
     scale.value = 1
     panX.value = 0
@@ -104,5 +104,3 @@ const styleObj = computed(() => {
   } as Record<string, string>
 })
 </script>
-
-

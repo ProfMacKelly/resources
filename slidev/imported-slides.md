@@ -25,3 +25,6 @@ Page 2 from another file.
 ```
 
 [Learn more](https://sli.dev/guide/syntax.html#importing-slides)
+
+---
+src: ./courses/bus-law/torts/negligence/negtest.slides.md
