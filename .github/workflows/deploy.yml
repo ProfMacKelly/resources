@@ -1,0 +1,64 @@
+name: Deploy Slidev to GitHub Pages
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      # Force lockfile usage ON for this project in CI
+      - name: Force pnpm lockfile on (project)
+        run: |
+          pnpm -C slidev config set use-lockfile true --location project
+          pnpm -C slidev config set lockfile true --location project || true
+          echo "use-lockfile=$(pnpm -C slidev config get use-lockfile)"
+          echo "lockfile=$(pnpm -C slidev config get lockfile || true)"
+          ls -la slidev/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm -C slidev install --frozen-lockfile
+
+      - name: Build Slidev
+        run: pnpm -C slidev exec slidev build --base /resources/
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: slidev/dist
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: github-pages
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
