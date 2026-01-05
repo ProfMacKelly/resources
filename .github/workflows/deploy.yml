@@ -28,12 +28,14 @@ jobs:
       - uses: pnpm/action-setup@v4
         with:
           version: 9
-          
-      - name: Show pnpm lockfile setting
-        run: pnpm -C slidev config get use-lockfile
+
+      - name: Force pnpm to allow lockfile (CI)
+        run: |
+          pnpm -C slidev config set use-lockfile true
+          pnpm -C slidev config get use-lockfile
 
       - name: Install dependencies
-        run: NPM_CONFIG_USE_LOCKFILE=true pnpm -C slidev install --frozen-lockfile
+        run: pnpm -C slidev install --frozen-lockfile
 
       - name: Build Slidev
         run: pnpm -C slidev exec slidev build --base /resources/
