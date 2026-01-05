@@ -1,6 +1,5 @@
 name: Deploy Slidev to GitHub Pages
 
-# Reference: .github/workflows/deploy.yml at ref 504098f112881d756c2fd7ff3fb6eeef16e3a8ae
 on:
   workflow_dispatch:
   push:
@@ -20,146 +19,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v4
         with:
           version: 10
 
-      - name: Install slidev dependencies (verbose)
-        env:
-          PNPM_LOG_LEVEL: debug
-        run: |
-          echo "== pnpm install (slidev) start: $(date) =="
-          pnpm --prefix slidev install --no-frozen-lockfile
-          echo "== pnpm install (slidev) end: $(date) =="
+      - name: Install dependencies
+        run: pnpm -C slidev install --no-frozen-lockfile
 
       - name: Ensure lockfile did not change
         run: |
           git status --porcelain
           git diff --exit-code -- slidev/pnpm-lock.yaml
-
-      - name: Print versions & environment (verbose)
-        run: |
-          echo "== Versions =="
-          node --version || true
-          pnpm --version || true
-          pnpm --prefix slidev exec -- slidev --version || true
-          echo
-          echo "== Git status =="
-          git status --short --untracked-files=all || true
-          echo
-          echo "== Disk usage =="
-          du -sh . || true
-          echo
-          echo "== Repo root listing =="
-          ls -la || true
-          echo
-          echo "== slidev listing =="
-          ls -la slidev || true
-
-      - name: Ensure slide input exists & print sample
-        run: |
-          SLIDE_PATH="decks/bus-law/torts/negligence/negligence.slides.md"
-          echo "Checking for slide: $SLIDE_PATH"
-          if [ ! -f "$SLIDE_PATH" ]; then
-            echo "ERROR: Slide file not found: $SLIDE_PATH"
-            echo "Contents of decks:"
-            ls -la decks || true
-            exit 1
-          fi
-          echo "Slide file found. Showing head (first 200 lines):"
-          head -n 200 "$SLIDE_PATH" || true
-
-      - name: Build negligence deck (verbose logs)
-        env:
-          PNPM_LOG_LEVEL: debug
-          DEBUG: "slidev:*,vite:*"
-        run: |
-          set -euo pipefail
-          mkdir -p slidev/build-logs
-          LOG=slidev/build-logs/build.log
-          echo "Build started: $(date)" > "$LOG"
-          echo "Command: pnpm --prefix slidev exec slidev build decks/negligence.slides.md --base /resources/bus-law/torts/negligence/negligence_slidev/ --out dist" >> "$LOG"
-          # Run build, capture stdout+stderr into the log while also showing in workflow console
-          set -o pipefail
-          PNPM_LOG_LEVEL=debug DEBUG=slidev:*,vite:* pnpm --prefix slidev exec slidev build decks/negligence.slides.md --base /resources/bus-law/torts/negligence/negligence_slidev/ --out dist 2>&1 | tee -a "$LOG"
-          rc=${PIPESTATUS[0]:-0}
-          echo "Build finished: $(date) (exit $rc)" | tee -a "$LOG"
-          if [ "$rc" -ne 0 ]; then
-            echo "== Build failed - tail of build log (last 200 lines) =="
-            tail -n 200 "$LOG" || true
-            # keep logs in repo workspace for artifact copy step
-            exit $rc
-          fi
-          echo "== Build succeeded; log size = $(wc -c < "$LOG") bytes =="
-
-      - name: Show build output & logs (short)
-        run: |
-          echo "== slidev/dist top-level =="
-          ls -la slidev/dist || true
-          echo
-          echo "== Find HTML files under slidev/dist =="
-          find slidev/dist -maxdepth 5 -type f -name '*.html' -print || true
-          echo
-          echo "== Tail of slidev/build-logs/build.log (last 200 lines) =="
-          tail -n 200 slidev/build-logs/build.log || true
-          echo
-          echo "== Full build log head (first 200 lines) =="
-          head -n 200 slidev/build-logs/build.log || true
+      - name: Build Slidev
+        run: pnpm -C slidev exec slidev build --base /resources/
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
-      - id: find-artifact
-        name: Locate artifact directory and attach logs
-        run: |
-          set -euo pipefail
-          if [ ! -d slidev/dist ]; then
-            echo "ERROR: slidev/dist directory not found" >&2
-            exit 1
-          fi
-
-          # Prefer slidev/dist root if it contains index.html
-          if [ -f slidev/dist/index.html ]; then
-            artifact="slidev/dist"
-            echo "Detected artifact: $artifact"
-            echo "artifact_path=$artifact" >> "$GITHUB_OUTPUT"
-          else
-            # Search for the first directory under slidev/dist that contains index.html
-            found=$(find slidev/dist -maxdepth 5 -type f -name index.html -printf '%h\n' | head -n 1 || true)
-            if [ -n "$found" ]; then
-              artifact="$found"
-              echo "Detected nested artifact: $artifact"
-              echo "artifact_path=$artifact" >> "$GITHUB_OUTPUT"
-            else
-              echo "ERROR: No index.html found under slidev/dist" >&2
-              echo "slidev/dist contents:" >&2
-              find slidev/dist -maxdepth 5 -print >&2 || true
-              exit 1
-            fi
-          fi
-
-          # Copy verbose build logs into the artifact so they are available in the Pages artifact
-          if [ -d slidev/build-logs ]; then
-            mkdir -p "$artifact/_build_logs"
-            cp -a slidev/build-logs/* "$artifact/_build_logs/" || true
-            echo "Copied build logs into $artifact/_build_logs/"
-          else
-            echo "No slidev/build-logs to copy"
-          fi
-
-      - name: Upload artifact (site + logs)
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ steps.find-artifact.outputs.artifact_path }}
+          path: slidev/dist
 
   deploy:
     runs-on: ubuntu-latest
