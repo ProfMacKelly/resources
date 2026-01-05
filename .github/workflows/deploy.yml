@@ -29,45 +29,13 @@ jobs:
         with:
           version: 10
 
-      - name: Show pnpm + lockfile info
-        run: |
-          pnpm --version
-          ls -la slidev
-          ls -la slidev/pnpm-lock.yaml
-
-      - name: Debug pnpm lockfile config (CI)
-        run: |
-          echo "pnpm version:"
-          pnpm --version
-
-          echo "pwd + list repo root:"
-          pwd
-          ls -la
-
-          echo "list slidev dir:"
-          ls -la slidev
-
-          echo "show lockfile:"
-          ls -la slidev/pnpm-lock.yaml || true
-          echo "lockfile header:"
-          head -n 5 slidev/pnpm-lock.yaml || true
-
-          echo "show slidev/.npmrc:"
-          if [ -f slidev/.npmrc ]; then cat slidev/.npmrc; else echo "MISSING slidev/.npmrc"; fi
-
-          echo "pnpm config values:"
-          pnpm -C slidev config get use-lockfile || true
-          pnpm -C slidev config get lockfile || true
-          pnpm -C slidev config get frozen-lockfile || true
-
-          echo "env vars that might affect lockfiles:"
-          env | grep -i lockfile || true
-          env | grep -i pnpm || true
-          env | grep -i npm_config || true
-
-          
       - name: Install dependencies
-        run: pnpm -C slidev install --frozen-lockfile
+        run: pnpm -C slidev install --no-frozen-lockfile
+
+      - name: Ensure lockfile did not change
+        run: |
+          git status --porcelain
+          git diff --exit-code -- slidev/pnpm-lock.yaml
 
       - name: Build Slidev
         run: pnpm -C slidev exec slidev build --base /resources/
