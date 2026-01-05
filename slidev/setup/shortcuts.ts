@@ -16,7 +16,7 @@ function clamp(n: number, min: number, max: number) {
 }
 
 function emit() {
-  window.dispatchEvent(new CustomEvent('slidev:presenter-zoompan'))
+  window.dispatchEvent(new Event('slidev:presenter-zoompan'))
 }
 
 function pathSegments(pathname = location.pathname) {

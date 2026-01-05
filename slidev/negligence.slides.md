@@ -198,7 +198,7 @@ what's up?
 
 ---
 class: text-center
-alias: not_liable
+routeAlias: not_liable
 ---
 
 # Outcome
@@ -207,7 +207,7 @@ D is not liable for negligence.
 
 
 ---
-alias: breach
+routeAlias: breach
 decision: true
 question: "Breach?"
 yesTarget: causation
@@ -225,11 +225,11 @@ graph TD
     style Q2 stroke-width:4px,stroke:#4ade80
 ```
 ---
-alias: causation
+routeAlias: causation
 decision: true
 question: "Causation?"
-yesTarget: breach
-noTarget: damages
+yesTarget: damages
+noTarget: not_liable
 ---
 
 # Element 3: Causation
@@ -243,15 +243,21 @@ graph TD
     style Q3 stroke-width:4px,stroke:#4ade80
 ```
 ---
-alias: damages
+routeAlias: damages
 decision: true
-question: "Causation?"
-yesTarget: 4
-noTarget: 7
+question: "Damages?"
+yesTarget: liable
+noTarget: not_liable
 dragPos:
   square: -109,0,0,0
 ---
 
+# What are the damages?
+
+Calculate claimed damages. (The P and D can both make an argument for what the damages should be.)
+
+
+---
 ```mermaid
 graph TB
 

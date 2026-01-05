@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { onKeyStroke, useStorage } from '@vueuse/core'
 import { useNav } from '@slidev/client'
 import { useRouter } from 'vue-router'
@@ -9,81 +9,62 @@ const router = useRouter()
 
 const fm = computed(() => currentSlideRoute.value?.meta?.slide?.frontmatter || {})
 
+function isTypingTarget(el: EventTarget | null) {
+  const t = el as HTMLElement | null
+  if (!t) return false
+  const tag = t.tagName?.toLowerCase()
+  return tag === 'input' || tag === 'textarea' || (t as any).isContentEditable
+}
+
+const isPresenterPath = computed(() => {
+  const path = String(router.currentRoute.value.path || '')
+  return path.split('/').includes('presenter')
+})
+
+function pathFor(target: string | number) {
+  const base = isPresenterPath.value ? '/presenter' : ''
+
+  // numeric target
+  if (typeof target === 'number') return `${base}/${target}`
+
+  const raw = String(target).trim()
+  if (!raw) return `${base}/1`
+
+  // numeric string
+  if (/^\d+$/.test(raw)) return `${base}/${raw}`
+
+  // route alias or custom path segment
+  const slug = raw.replace(/^\/+/, '')
+  return `${base}/${slug}`
+}
+
+function navigate(target: string | number) {
+  router.push(pathFor(target))
+}
+
 const slideId = computed(() => {
   if (!currentSlideRoute.value) return 'Loading...'
-  return fm.value.alias || fm.value.id || 'None'
+  // Prefer Slidev route alias (official), then fall back to any custom keys you used before
+  return fm.value.routeAlias || fm.value.alias || fm.value.id || 'None'
 })
 
 const decisionHistory = useStorage<any[]>('slidev-decision-history', [])
 const isBlackedOut = ref(false)
 
-const toggleBlackout = (e?: Event) => {
+function toggleBlackout(e?: Event) {
   e?.stopPropagation()
   isBlackedOut.value = !isBlackedOut.value
 }
 
-// Slide Alias Index
-const aliasToIndex = ref<Record<string, number>>({
-  start: 1,
-  overview: 2,
-  overview_flowchart: 3,
-  duty_overview: 5,
-  duty_flowchart: 6,
-  breach: 20,
-  causation: 21,
-  damages: 22,
-})
-
-// Build alias map by resolving numeric routes
-const buildAliasIndex = () => {
-  const map: Record<string, number> = {}
-  const count = Number(total.value) || 0
-  for (let i = 1; i <= count; i++) {
-    const resolved = router.resolve(`/${i}`)
-    const fmForI = resolved?.meta?.slide?.frontmatter
-    const alias = fmForI?.alias
-    if (alias) map[String(alias).trim().toLowerCase()] = i
-  }
-  if (Object.keys(map).length > 0) {
-    aliasToIndex.value = map
-    console.log('Alias map built dynamically:', aliasToIndex.value)
-  } else {
-    console.warn('Alias builder found no aliases; keeping static map:', aliasToIndex.value)
-  }
-}
-
-const navigate = (target: string | number) => {
-  if (!target) return
-  const strTarget = String(target).trim()
-  const asNumber = Number(strTarget)
-
-  let index: number | undefined
-  if (!Number.isNaN(asNumber) && strTarget !== '') {
-    index = asNumber
-  } else {
-    index = aliasToIndex.value[strTarget.toLowerCase()]
-  }
-
-  if (!index) {
-    const fallback = aliasToIndex.value['start'] ?? 1
-    console.warn(`Unknown target "${strTarget}", falling back to /${fallback}`)
-    index = fallback
-  }
-
-  router.push(`/${index}`)
-}
-
-const resetPresentation = () => {
+function resetPresentation() {
   decisionHistory.value = []
-  const fallback = aliasToIndex.value['start'] ?? 1
-  router.push(`/${fallback}`)
+  navigate(1)
 }
 
-const makeDecision = (choice: 'yes' | 'no') => {
+function makeDecision(choice: 'yes' | 'no') {
+  if (isBlackedOut.value) return
   const rawTarget = choice === 'yes' ? fm.value.yesTarget : fm.value.noTarget
   if (!rawTarget) return
-
-  const target = String(rawTarget).trim()
 
   decisionHistory.value.push({
     slide: currentPage.value,
@@ -91,34 +72,44 @@ const makeDecision = (choice: 'yes' | 'no') => {
     choice: choice === 'yes' ? 'Y' : 'N',
   })
 
-  navigate(target)
+  navigate(String(rawTarget).trim())
 }
 
-const goBack = () => {
+function goBack() {
   if (decisionHistory.value.length > 0) {
     const last = decisionHistory.value.pop()
-    navigate(last.slide)
+    // last.slide is numeric page; keep it numeric
+    navigate(Number(last.slide) || 1)
   } else {
     prev()
   }
 }
 
-// Keyboard shortcuts
-onKeyStroke(['b', 'B'], (e) => { e.preventDefault(); toggleBlackout() })
-onKeyStroke(['y', 'Y'], () => { if (fm.value.decision && !isBlackedOut.value) makeDecision('yes') })
-onKeyStroke(['n', 'N'], () => { if (fm.value.decision && !isBlackedOut.value) makeDecision('no') })
-onKeyStroke(['r', 'R'], () => { if (!isBlackedOut.value) resetPresentation() })
+// Keyboard shortcuts (ignore typing targets)
+onKeyStroke(['b', 'B'], (e) => {
+  if (isTypingTarget(e.target)) return
+  e.preventDefault()
+  toggleBlackout()
+})
 
-onMounted(buildAliasIndex)
+onKeyStroke(['y', 'Y'], (e) => {
+  if (isTypingTarget(e.target)) return
+  if (fm.value.decision && !isBlackedOut.value) makeDecision('yes')
+})
 
-// Log current slide metadata whenever it changes
-watch(currentSlideRoute, (route) => {
-  console.log('Current slide frontmatter:', route?.meta?.slide?.frontmatter)
+onKeyStroke(['n', 'N'], (e) => {
+  if (isTypingTarget(e.target)) return
+  if (fm.value.decision && !isBlackedOut.value) makeDecision('no')
+})
+
+onKeyStroke(['r', 'R'], (e) => {
+  if (isTypingTarget(e.target)) return
+  if (!isBlackedOut.value) resetPresentation()
 })
 </script>
 
 <template>
-  
+  <!-- Decision breadcrumbs (history) -->
   <div v-if="decisionHistory.length > 0" class="fixed top-0 left-0 p-3 z-50 flex gap-2 pointer-events-none">
     <div
       v-for="(step, i) in decisionHistory"
@@ -126,14 +117,19 @@ watch(currentSlideRoute, (route) => {
       class="bg-white/80 backdrop-blur border border-gray-200 px-2 py-1 rounded shadow-sm text-[10px] flex items-center gap-1"
     >
       <span class="text-gray-400 uppercase tracking-tighter">{{ step.label }}</span>
-      <span :class="step.choice === 'Y' ? 'text-green-600 font-bold' : 'text-red-600 font-bold'">{{ step.choice }}</span>
+      <span :class="step.choice === 'Y' ? 'text-green-600 font-bold' : 'text-red-600 font-bold'">
+        {{ step.choice }}
+      </span>
     </div>
   </div>
 
+  <!-- Tiny slide indicator (top-right) -->
   <div class="fixed top-0 right-0 p-2 opacity-20 text-[10px] pointer-events-none font-mono flex flex-col items-end">
     <div>Slide: {{ currentPage }} / {{ total }}</div>
+    <div>ID: {{ slideId }}</div>
   </div>
 
+  <!-- Bottom-right controls -->
   <div class="fixed bottom-2 right-2 flex items-center gap-6 z-[1000] pointer-events-none">
     <div class="flex items-center gap-4 pointer-events-auto bg-white/80 backdrop-blur p-2 rounded-lg border border-gray-200 shadow-sm">
       <button
@@ -185,6 +181,7 @@ watch(currentSlideRoute, (route) => {
     </div>
   </div>
 
+  <!-- Blackout overlay -->
   <div
     v-if="isBlackedOut"
     @click="toggleBlackout"
@@ -192,6 +189,4 @@ watch(currentSlideRoute, (route) => {
   >
     <p class="text-white/30 uppercase tracking-widest text-sm font-bold">Paused</p>
   </div>
-
-
 </template>
