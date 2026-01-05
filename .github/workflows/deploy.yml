@@ -38,7 +38,7 @@ jobs:
           git diff --exit-code -- slidev/pnpm-lock.yaml
 
       - name: Build negligence deck
-        run: pnpm -C slidev exec slidev build decks/bus-law//torts/negligence/negligence.slides.md --base /resources/bus-law/torts/negligence/negligence_slidev/ --out dist
+        run: pnpm -C slidev exec slidev build decks/bus-law/torts/negligence/negligence.slides.md --base /resources/bus-law/torts/negligence/negligence_slidev/ --out dist
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
