@@ -71,8 +71,8 @@ jobs:
           echo "Checking for slide: $SLIDE_PATH"
           if [ ! -f "$SLIDE_PATH" ]; then
             echo "ERROR: Slide file not found: $SLIDE_PATH"
-            echo "Contents of decks/bus-law/torts/negligence:"
-            ls -la decks/bus-law/torts/negligence || true
+            echo "Contents of decks:"
+            ls -la decks || true
             exit 1
           fi
           echo "Slide file found. Showing head (first 200 lines):"
@@ -87,10 +87,10 @@ jobs:
           mkdir -p slidev/build-logs
           LOG=slidev/build-logs/build.log
           echo "Build started: $(date)" > "$LOG"
-          echo "Command: pnpm --prefix slidev exec slidev build decks/bus-law/torts/negligence/negligence.slides.md --base /resources/bus-law/torts/negligence/negligence_slidev/ --out dist" >> "$LOG"
+          echo "Command: pnpm --prefix slidev exec slidev build decks/negligence.slides.md --base /resources/bus-law/torts/negligence/negligence_slidev/ --out dist" >> "$LOG"
           # Run build, capture stdout+stderr into the log while also showing in workflow console
           set -o pipefail
-          PNPM_LOG_LEVEL=debug DEBUG=slidev:*,vite:* pnpm --prefix slidev exec slidev build decks/bus-law/torts/negligence/negligence.slides.md --base /resources/bus-law/torts/negligence/negligence_slidev/ --out dist 2>&1 | tee -a "$LOG"
+          PNPM_LOG_LEVEL=debug DEBUG=slidev:*,vite:* pnpm --prefix slidev exec slidev build decks/negligence.slides.md --base /resources/bus-law/torts/negligence/negligence_slidev/ --out dist 2>&1 | tee -a "$LOG"
           rc=${PIPESTATUS[0]:-0}
           echo "Build finished: $(date) (exit $rc)" | tee -a "$LOG"
           if [ "$rc" -ne 0 ]; then
