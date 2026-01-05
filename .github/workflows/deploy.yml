@@ -30,7 +30,7 @@ jobs:
           version: 9
 
       - name: Install dependencies
-        run: pnpm -C slidev install --frozen-lockfile
+        run: NPM_CONFIG_USE_LOCKFILE=true pnpm -C slidev install --frozen-lockfile
 
       - name: Build Slidev
         run: pnpm -C slidev exec slidev build --base /resources/
