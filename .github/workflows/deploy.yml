@@ -17,6 +17,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -24,17 +25,17 @@ jobs:
         with:
           node-version: 'lts/*'
 
-      # pnpm (recommended for your repo)
       - uses: pnpm/action-setup@v4
         with:
           version: 9
 
-      - name: Install deps
-        run: pnpm install --frozen-lockfile
+      # Install deps IN slidev/ (robust: doesn't rely on working-directory)
+      - name: Install dependencies
+        run: pnpm -C slidev install --frozen-lockfile
 
-      # Build your main deck (slides.md)
-      - name: Build
-        run: pnpm exec slidev build --base /${{ github.event.repository.name }}/
+      # Build IN slidev/
+      - name: Build Slidev
+        run: pnpm -C slidev exec slidev build --base /resources/
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -42,14 +43,15 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: slidev/dist
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
     environment:
       name: github-pages
+
     steps:
-      - name: Deploy
+      - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
