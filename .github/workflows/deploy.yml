@@ -29,41 +29,9 @@ jobs:
         with:
           version: 9
 
-      # DEBUG: print what the runner actually sees (workspace + npmrc + lockfile config)
-      - name: Debug workspace + pnpm config
-        run: |
-          echo "=== repo root ==="
-          pwd
-          ls -la
+      - name: Install dependencies
+        run: pnpm -C slidev install --frozen-lockfile
 
-          echo "=== slidev dir ==="
-          ls -la slidev
-
-          echo "=== slidev/pnpm-workspace.yaml ==="
-          if [ -f slidev/pnpm-workspace.yaml ]; then cat slidev/pnpm-workspace.yaml; else echo "MISSING"; fi
-
-          echo "=== root pnpm-workspace.yaml ==="
-          if [ -f pnpm-workspace.yaml ]; then cat pnpm-workspace.yaml; else echo "none"; fi
-
-          echo "=== root .npmrc ==="
-          if [ -f .npmrc ]; then cat .npmrc; else echo "none"; fi
-
-          echo "=== slidev/.npmrc ==="
-          if [ -f slidev/.npmrc ]; then cat slidev/.npmrc; else echo "none"; fi
-
-          echo "=== pnpm config (key items) ==="
-          pnpm --version
-          pnpm config get use-lockfile || true
-          pnpm config get lockfile || true
-
-          echo "=== lockfile presence ==="
-          if [ -f slidev/pnpm-lock.yaml ]; then echo "FOUND slidev/pnpm-lock.yaml"; else echo "MISSING slidev/pnpm-lock.yaml"; fi
-
-      # TEMP UNBLOCK: install without frozen lockfile so build can proceed
-      - name: Install dependencies (temporary unblock)
-        run: pnpm -C slidev install --no-frozen-lockfile
-
-      # Build IN slidev/
       - name: Build Slidev
         run: pnpm -C slidev exec slidev build --base /resources/
 
