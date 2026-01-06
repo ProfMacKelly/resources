@@ -54,7 +54,6 @@ alias: overview
 
 ---
 alias: overview_flowchart
-class: -mt--45
 ---
 
 <Transform :scale="2.0" origin="left">
