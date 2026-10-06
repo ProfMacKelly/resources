@@ -113,7 +113,8 @@ Did D breach the duty to P?
 
 ---
 
-routeAlias: causation
+blank
+
 ---
 
 # Element 3: Causation
@@ -137,8 +138,19 @@ Did the defendant's breach cause harm?
 </div>
 
 ---
-
 routeAlias: damages
+---
+
+---
+routeAlias: damages
+-
+
+---
+routeAlias: damages
+
+---
+
+
 ---
 
 # What are the damages?
@@ -314,6 +326,22 @@ graph TD
     Q2 -->|No| End[No Liability]
     style Q2 stroke-width:4px,stroke:#4ade80
 ```
+<div class="flex gap-6 mt-10 justify-center">
+  <Link
+    to="causation"
+    class="px-8 py-4 rounded-lg bg-green-600 text-white font-bold text-xl"
+  >
+    Yes
+  </Link>
+
+  <Link
+    to="not_liable"
+    class="px-8 py-4 rounded-lg bg-red-600 text-white font-bold text-xl"
+  >
+    No
+  </Link>
+</div>
+
 ---
 routeAlias: causation
 decision: true
