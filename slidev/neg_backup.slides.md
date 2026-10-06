@@ -89,9 +89,95 @@ flowchart TB
 </Transform>
 
 ---
+class: -mt-5
+alias: duties
 ---
 
+### When is there a duty?
+<!--
+
+1. **Foreseeability**  
+   [click]
+ - Common law duty to avoid causing foreseeable harm to others
+
+2. **On the Premises**
+   - Owners/Possessors of a premises owe special duty to warn
+
+3. **Special Relationships**
+   - Special duties owed to certain relationship counterparts
+
+4. **Creation of Risk**
+   - Duty created when person creates a risk to others
+
+5. **Assumption of Duty**
+   - Duty exists when person assumes a duty that didn't previously exist
+
+6. **Contract**
+   - Contracts create duties between the contracting parties
+
+<!--
+Content before the first click
+
+[click] This will be highlighted after the first click
+
+Also highlighted after the first click
+
+- [click] This list element will be highlighted after the second click
+
+[click:3] Last click (skip two clicks)
+-->
+
 ---
+class: -mt-5
+alias: duties
+---
+
+### When is there a duty?
+
+<v-clicks>
+
+1. **Foreseeability**  
+   - Common law duty to avoid causing foreseeable harm to others
+
+2. **On the Premises**
+   - Owners/Possessors of a premises owe special duty to warn
+
+3. **Special Relationships**
+   - Special duties owed to certain relationship counterparts
+
+4. **Creation of Risk**
+   - Duty created when person creates a risk to others
+
+5. **Assumption of Duty**
+   - Duty exists when person assumes a duty that didn't previously exist
+
+6. **Contract**
+   - Contracts create duties between the contracting parties
+
+</v-clicks>
+
+<!--
+1. **Foreseeability**  
+   - Common law duty to avoid causing foreseeable harm to others
+
+[click] 2. **On the Premises**
+   - Owners/Possessors of a premises owe special duty to warn
+
+[click:3] 3. **Special Relationships**
+   - Special duties owed to certain relationship counterparts
+
+4. **Creation of Risk**
+   - Duty created when person creates a risk to others
+
+5. **Assumption of Duty**
+   - Duty exists when person assumes a duty that didn't previously exist
+
+6. **Contract**
+   - Contracts create duties between the contracting parties
+-->
+
+---
+
 class: -mt-5
 alias: duties
 ---
@@ -227,7 +313,7 @@ graph TD
 alias: causation
 decision: true
 question: "Causation?"
-yesTarget: breach
+yesTarget: duty
 noTarget: damages
 ---
 
@@ -241,6 +327,7 @@ graph TD
     Q3 -->|No| End[No Liability]
     style Q3 stroke-width:4px,stroke:#4ade80
 ```
+
 ---
 alias: damages
 decision: true

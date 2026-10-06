@@ -88,7 +88,98 @@ flowchart TB
 </Transform>
 
 ---
+routeAlias: breach
 ---
+
+# Element 2: Breach
+
+Did D breach the duty to P?
+
+<div class="flex gap-6 mt-10 justify-center">
+  <Link
+    to="causation"
+    class="px-8 py-4 rounded-lg bg-green-600 text-white font-bold text-xl"
+  >
+    Yes
+  </Link>
+
+  <Link
+    to="not_liable"
+    class="px-8 py-4 rounded-lg bg-red-600 text-white font-bold text-xl"
+  >
+    No
+  </Link>
+</div>
+
+---
+
+routeAlias: causation
+---
+
+# Element 3: Causation
+
+Did the defendant's breach cause harm?
+
+<div class="flex gap-6 mt-10 justify-center">
+  <Link
+    to="damages"
+    class="px-8 py-4 rounded-lg bg-green-600 text-white font-bold text-xl"
+  >
+    Yes
+  </Link>
+
+  <Link
+    to="not_liable"
+    class="px-8 py-4 rounded-lg bg-red-600 text-white font-bold text-xl"
+  >
+    No
+  </Link>
+</div>
+
+---
+
+routeAlias: damages
+---
+
+# What are the damages?
+
+Calculate claimed damages.
+
+<div class="flex gap-6 mt-10 justify-center">
+  <Link
+    to="liable"
+    class="px-8 py-4 rounded-lg bg-green-600 text-white font-bold text-xl"
+  >
+    Yes
+  </Link>
+
+  <Link
+    to="not_liable"
+    class="px-8 py-4 rounded-lg bg-red-600 text-white font-bold text-xl"
+  >
+    No
+  </Link>
+</div>
+
+---
+
+routeAlias: liable
+class: text-center
+---
+
+# Outcome
+
+D is liable for negligence.
+
+---
+
+routeAlias: not_liable
+class: text-center
+---
+
+# Outcome
+
+D is not liable for negligence.
 
 ---
 class: -mt-5
@@ -124,12 +215,12 @@ class: -mt--10
 ---
 
 Duty Flowchart
-<Transform :scale="2.2" origin="left">
+<Transform :scale="2.1" origin="left">
 
 ```mermaid
 flowchart LR 
     start["**START HERE**"] --> du["Did D owe a<br/>**legal duty** to P?"]
-    du --> du1["1. Was there a **foreseeable** harm to P"]
+    du --> du1["1. Was there a foreseeable<br/> harm to P"]
     du --> du2["2, Did D own/possess a **premises** relevant to the circumstances?"]
     du --> du3["3. Did did and P have a **special relationship**?"]
     du --> du4["4. Did D **create** a risk**?"]
@@ -280,4 +371,3 @@ graph TB
     li@{ shape: diamond}
     style li stroke-width:2.5px,fill:#edffeb,stroke:#19531c
 ```
-
