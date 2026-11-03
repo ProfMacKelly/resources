@@ -1,4 +1,5 @@
 ---
+favicon: 'https://profmackelly.github.io/resources/assets/site-icon.png?v=20261103'
 # try 'default' to start simple
 theme: default
 # like them? see https://unsplash.com/collections/94734566/slidev
