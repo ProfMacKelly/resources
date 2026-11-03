@@ -1,4 +1,4 @@
-name: Deploy Slidev to GitHub Pages
+name: Deploy resources website to GitHub Pages
 
 on:
   workflow_dispatch:
@@ -39,7 +39,19 @@ jobs:
           git status --porcelain
           git diff --exit-code -- slidev/pnpm-lock.yaml
       - name: Build Slidev
-        run: pnpm -C slidev exec slidev build --base /resources/
+        run: pnpm -C slidev exec slidev build --base /resources/slidev/
+
+      - name: Assemble website
+        run: |
+          mkdir -p _site
+          git archive HEAD | tar -x -C _site --exclude='.github' --exclude='.vscode' --exclude='slidev'
+          cp -a slidev/dist _site/slidev
+
+      - name: Verify website entry points
+        run: |
+          cmp index.html _site/index.html
+          test -f _site/slidev/index.html
+          test -f _site/decsion_tree_template.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -47,7 +59,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: slidev/dist
+          path: _site
 
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
