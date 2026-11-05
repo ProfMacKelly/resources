@@ -20,7 +20,7 @@ style: |
   section pre, section code { font-size: 17px; }
   section code { font-size: 0.9em; }
   section pre code { font-size: 1em; }
-  header, footer { color: #737373; font-size: 13px; }
+  header, footer { color: #737373; background-color: #fffdfa; font-size: 13px; }
   section::after { color: #737373; font-size: 13px; right: 48px; }
 
   /* <!-- _class: lead --> */
@@ -48,7 +48,7 @@ style: |
   section.invert header, section.invert footer, section.invert::after, section.invert .source { color: #ffffffaa; }
 ---
 
-# **Cheatslides**
+# ***Cheatslides***
 
 ## Markdown Presentation Ecosystem 
 
