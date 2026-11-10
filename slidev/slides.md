@@ -1,4 +1,5 @@
 ---
+favicon: 'https://profmackelly.github.io/resources/assets/site-icon.png?v=20261103'
 # try 'default' to start simple
 theme: default
 # like them? see https://unsplash.com/collections/94734566/slidev
@@ -6,7 +7,7 @@ background: none
 # slide transition: https://sli.dev/guide/animations.html#slide-transitions
 transition: slide-left
 # enable MDC Syntax: https://sli.dev/features/mdc
-mdc: true\
+mdc: true
 hideArrow: false
 # https://sli.dev/features/drawing
 drawings:
@@ -17,7 +18,7 @@ canvasWidth: 760  # was 980; smaller = everything appears larger on screen
 
 title: Negligence & Products Liability
 layout: center
-alias: start
+routeAlias: start
 
 defaults:
   layout: zoomable
@@ -29,7 +30,7 @@ defaults:
 
 ---
 class: -mt-8
-alias: overview
+routeAlias: overview
 ---
 
 ## Overview: Negligence in General
@@ -53,7 +54,7 @@ alias: overview
 </v-clicks>
 
 ---
-alias: overview_flowchart
+routeAlias: overview_flowchart
 ---
 
 <Transform :scale="2.0" origin="left">
@@ -92,7 +93,7 @@ flowchart TB
 
 ---
 class: -mt-5
-alias: duties
+routeAlias: duties
 ---
 
 ### When is there a duty?
@@ -124,12 +125,12 @@ class: -mt--10
 ---
 
 Duty Flowchart
-<Transform :scale="2.2" origin="left">
+<Transform :scale="2.1" origin="left">
 
 ```mermaid
 flowchart LR 
     start["**START HERE**"] --> du["Did D owe a<br/>**legal duty** to P?"]
-    du --> du1["1. Was there a **foreseeable** harm to P"]
+    du --> du1["1. Was there a foreseeable<br/> harm to P"]
     du --> du2["2, Did D own/possess a **premises** relevant to the circumstances?"]
     du --> du3["3. Did did and P have a **special relationship**?"]
     du --> du4["4. Did D **create** a risk**?"]
@@ -174,7 +175,7 @@ flowchart TB
     style not_liab stroke-width:2.5px,fill:#FFF8F8,stroke:#880101
 ```
 ---
-alias: overview_map
+routeAlias: overview_map
 zoom: 1.3
 ---
 
@@ -182,7 +183,7 @@ x
 
 
 ---
-alias: placeholder
+routeAlias: placeholder
 ---
 # Element 1: Duty
 Did D have a duty to P?
@@ -203,6 +204,16 @@ routeAlias: not_liable
 # Outcome
 
 D is not liable for negligence.
+
+
+---
+class: text-center
+routeAlias: liable
+---
+
+# Outcome
+
+D is liable for negligence.
 
 
 ---
@@ -280,4 +291,3 @@ graph TB
     li@{ shape: diamond}
     style li stroke-width:2.5px,fill:#edffeb,stroke:#19531c
 ```
-

@@ -2,10 +2,8 @@
 import { computed, ref } from 'vue'
 import { onKeyStroke, useStorage } from '@vueuse/core'
 import { useNav } from '@slidev/client'
-import { useRouter } from 'vue-router'
 
-const { currentPage, total, prev, next, currentSlideRoute } = useNav()
-const router = useRouter()
+const { currentPage, total, prev, next, go, currentSlideRoute } = useNav()
 
 const fm = computed(() => currentSlideRoute.value?.meta?.slide?.frontmatter || {})
 
@@ -16,31 +14,6 @@ function isTypingTarget(el: EventTarget | null) {
   return tag === 'input' || tag === 'textarea' || (t as any).isContentEditable
 }
 
-const isPresenterPath = computed(() => {
-  const path = String(router.currentRoute.value.path || '')
-  return path.split('/').includes('presenter')
-})
-
-function pathFor(target: string | number) {
-  const base = isPresenterPath.value ? '/presenter' : ''
-
-  // numeric target
-  if (typeof target === 'number') return `${base}/${target}`
-
-  const raw = String(target).trim()
-  if (!raw) return `${base}/1`
-
-  // numeric string
-  if (/^\d+$/.test(raw)) return `${base}/${raw}`
-
-  // route alias or custom path segment
-  const slug = raw.replace(/^\/+/, '')
-  return `${base}/${slug}`
-}
-
-function navigate(target: string | number) {
-  router.push(pathFor(target))
-}
 
 const slideId = computed(() => {
   if (!currentSlideRoute.value) return 'Loading...'
@@ -58,12 +31,16 @@ function toggleBlackout(e?: Event) {
 
 function resetPresentation() {
   decisionHistory.value = []
-  navigate(1)
+  go(1)
 }
 
 function makeDecision(choice: 'yes' | 'no') {
   if (isBlackedOut.value) return
-  const rawTarget = choice === 'yes' ? fm.value.yesTarget : fm.value.noTarget
+
+  const rawTarget = choice === 'yes'
+    ? fm.value.yesTarget
+    : fm.value.noTarget
+
   if (!rawTarget) return
 
   decisionHistory.value.push({
@@ -72,14 +49,13 @@ function makeDecision(choice: 'yes' | 'no') {
     choice: choice === 'yes' ? 'Y' : 'N',
   })
 
-  navigate(String(rawTarget).trim())
+  go(String(rawTarget).trim())
 }
 
 function goBack() {
   if (decisionHistory.value.length > 0) {
     const last = decisionHistory.value.pop()
-    // last.slide is numeric page; keep it numeric
-    navigate(Number(last.slide) || 1)
+    go(Number(last.slide) || 1)
   } else {
     prev()
   }

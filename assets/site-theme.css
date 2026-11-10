@@ -1,0 +1,38 @@
+/* Site adapters for the shared exercises theme. */
+body.sdj-document { color-scheme: light; }
+.sdj-document .sdj-content { min-height: calc(100vh - 80px); }
+.sdj-document .sdj-content > h1:first-child { margin-top: 0; }
+.sdj-document .sdj-directory { margin-top: 24px; }
+.sdj-document .sdj-directory li { margin: 10px 0; }
+.sdj-document a:focus-visible { outline: 3px solid var(--sdj-blue); outline-offset: 3px; }
+/* Keep presentation sizing and controls under the original renderer's control. */
+body.sdj-deck { --sdj-banner-height: 44px; margin: 0; }
+.sdj-deck > header.sdj-header { box-sizing: border-box; position: fixed; inset: 0 0 auto; z-index: 10000; height: var(--sdj-banner-height); min-height: 0; padding: 0; margin: 0; background: #0b4779; border: 0; color: white; }
+.sdj-deck > .sdj-header .sdj-header-inner { min-height: 0; height: 100%; max-width: none; padding: 6px 18px; flex-wrap: nowrap; gap: 14px; }
+.sdj-deck > .sdj-header a.sdj-brand { font-size: 15px; line-height: 24px; gap: 8px; }
+.sdj-deck > .sdj-header img.sdj-icon { width: 24px; height: 24px; }
+.sdj-deck > .sdj-header .sdj-section, .sdj-deck > .sdj-header a.sdj-source { font-size: 12px; }
+.sdj-deck > .sdj-header a.sdj-source { padding: 3px 8px; }
+.sdj-reveal > .reveal { position: absolute; top: var(--sdj-banner-height); height: calc(100% - var(--sdj-banner-height)); }
+.sdj-reveal > .overlay-ui { top: var(--sdj-banner-height); }
+.sdj-marp > .bespoke-marp-parent { top: var(--sdj-banner-height) !important; height: calc(100% - var(--sdj-banner-height)) !important; }
+@media screen { body.sdj-remark.remark-container { position: absolute; top: var(--sdj-banner-height); height: calc(100% - var(--sdj-banner-height)); width: 100%; } }
+.sdj-deck :is(.reveal, .remark-slide-content, section[data-marpit-svg], [data-marpit-svg] section) { font-family: Inter, Arial, sans-serif; }
+.sdj-deck :is(.reveal, .remark-slide-content) :is(h1,h2,h3,h4,h5,h6) { font-family: Inter, Arial, sans-serif; }
+.sdj-deck :is(.reveal, .remark-slide-content) a { color: #0b4779; }
+.sdj-deck :is(.reveal, .remark-slide-content) :is(pre,code) { font-family: 'IBM Plex Mono', monospace; }
+/* Presenter and next-slide windows retain their dedicated viewports. */
+body.sdj-marp[data-bespoke-view="presenter"], body.sdj-marp[data-bespoke-view="next"] { --sdj-banner-height: 0px; }
+.sdj-marp:is([data-bespoke-view="presenter"], [data-bespoke-view="next"]) > .sdj-header { display: none; }
+@media (max-width: 560px) { .sdj-deck > .sdj-header .sdj-section { display: none; } .sdj-deck > .sdj-header .sdj-header-inner { padding-inline: 10px; gap: 8px; } .sdj-deck > .sdj-header a.sdj-source { margin-left: auto; font-size: 11px; } }
+@media print { .sdj-header { display: none !important; } body.sdj-deck { --sdj-banner-height: 0px; } }
+
+/* Adapt the older library page without changing its card content. */
+.sdj-themed > header.sdj-header { max-width: none; }
+.sdj-document { --panel: #fff; --line: #dde5ed; --accent-strong: #0b4779; }
+.sdj-document .card, .sdj-document .card.featured { background: #fff; color: var(--sdj-ink); border-color: var(--sdj-line); }
+.sdj-document .card:hover { background: var(--sdj-soft); border-color: var(--sdj-blue); }
+.sdj-document .card::after { display: none; }
+.sdj-document .card .label { color: var(--sdj-blue); border-color: var(--sdj-line); }
+/* Core-only Marp exports are scrolling documents, without a Bespoke viewport. */
+.sdj-marp:not(:has(> .bespoke-marp-parent)) { padding-top: var(--sdj-banner-height); }
