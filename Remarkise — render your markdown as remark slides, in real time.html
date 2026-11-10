@@ -1,28 +1,130 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
 <head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>snippets</title>
-	<link rel="stylesheet" href="css/style.css" />
-	<link rel="stylesheet" href="css/overrides.css" />
-	<link href="https://fonts.googleapis.com" rel="preconnect" />
-	<link crossorigin="crossorigin" href="https://fonts.gstatic.com" rel="preconnect" />
-	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&amp;display=swap" rel="stylesheet" />
-	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&amp;display=swap" rel="stylesheet" />
-	<link href="https://cdnjs.cloudflare.com/ajax/libs/cc-icons/1.2.1/css/cc-icons.min.css" rel="stylesheet" />
-	<link href="https://pro.fontawesome.com/releases/v5.10.1/css/all.css" rel="stylesheet" />
-<link rel="stylesheet" href="../assets/fonts.css">
-<link rel="stylesheet" href="../assets/theme.css">
-<link rel="stylesheet" href="../assets/site-theme.css">
-<link rel="icon" type="image/png" href="../assets/site-icon.png?v=20261103">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Legal Decision Tree Deck</title>
+
+  <!-- Reveal.js -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/white.css">
+
+  <style>
+    /* Layout helpers */
+    .mermaid { font-size: 20px; }
+
+    /* Fixed UI overlay */
+    .overlay-ui {
+      position: fixed;
+      left: 0;
+      right: 0;
+      top: 0;
+      pointer-events: none;
+      z-index: 9999;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    .breadcrumbs {
+      pointer-events: auto;
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid rgba(0,0,0,0.12);
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(4px);
+      font-size: 14px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .crumb {
+      padding: 0.2rem 0.5rem;
+      border: 1px solid rgba(0,0,0,0.2);
+      border-radius: 999px;
+    }
+    .crumb .choice {
+      margin-left: 0.35rem;
+      font-weight: 600;
+    }
+
+    .controls {
+      position: fixed;
+      right: 0.75rem;
+      bottom: 0.75rem;
+      display: flex;
+      gap: 0.5rem;
+      pointer-events: auto;
+      z-index: 9999;
+    }
+
+    .btn {
+      border: 1px solid rgba(0,0,0,0.25);
+      border-bottom-width: 2px;
+      border-radius: 0.6rem;
+      padding: 0.5rem 0.75rem;
+      background: rgba(255,255,255,0.95);
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+      user-select: none;
+    }
+    .btn[disabled] {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .btn kbd {
+      display: inline-block;
+      border: 1px solid #888;
+      border-bottom-width: 2px;
+      padding: 0.05rem 0.3rem;
+      border-radius: 0.25rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.9em;
+      margin-left: 0.35rem;
+    }
+
+    .route-hint { font-size: 0.75em; opacity: 0.75; margin-top: 0.75rem; }
+
+    /*
+      Auto-highlight mechanism:
+
+      In Mermaid code, mark nodes/edges you want to highlight by branch using:
+        class X yesPath;
+        class Y noPath;
+
+      This template toggles .chosen-yes or .chosen-no on the CURRENT slide container
+      when it is reached via a Y/N choice.
+    */
+
+    /* Node styling: Mermaid renders nodes as <g class="node ..."> containing shapes */
+    .chosen-yes svg .yesPath > * { stroke-width: 4px !important; }
+    .chosen-no  svg .noPath  > * { stroke-width: 4px !important; }
+
+    /* Edges are often <path class="edgePath ..."> or within <g class="edgePath ..."> */
+    .chosen-yes svg .edgePath.yesPath path { stroke-width: 4px !important; }
+    .chosen-no  svg .edgePath.noPath  path { stroke-width: 4px !important; }
+
+    /*
+      Optional: If you DO want color emphasis, uncomment these.
+      (Left off by default to avoid clashing with your existing styling.)
+    */
+    /*
+    .chosen-yes svg .yesPath > * { stroke: #1a73e8 !important; }
+    .chosen-no  svg .noPath  > * { stroke: #d93025 !important; }
+    .chosen-yes svg .yesPath rect, .chosen-yes svg .yesPath polygon { fill: rgba(26,115,232,0.10) !important; }
+    .chosen-no  svg .noPath  rect, .chosen-no  svg .noPath  polygon { fill: rgba(217,48,37,0.10) !important; }
+    */
+  </style>
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/theme.css">
+<link rel="stylesheet" href="assets/site-theme.css">
+<link rel="icon" type="image/png" href="assets/site-icon.png?v=20261103">
 </head>
 
-<body class="sdj-themed sdj-document">
-<header class="sdj-header" aria-label="Juris Studies"><div class="sdj-header-inner"><a class="sdj-brand" href="../index.html"><img class="sdj-icon" src="../assets/site-icon.png" alt="" width="32" height="32"><span>Juris Studies</span></a><span class="sdj-section">Resources</span><a class="sdj-source" href="https://studies-de-jure.gitbook.io/learn/">← Back to sourcebook</a></div></header>
-<div class="sdj-content">
+<body class="sdj-deck sdj-reveal">
+<header class="sdj-header" aria-label="Juris Studies"><div class="sdj-header-inner"><a class="sdj-brand" href="index.html"><img class="sdj-icon" src="assets/site-icon.png" alt="" width="32" height="32"><span>Juris Studies</span></a><span class="sdj-section">Resources</span><a class="sdj-source" href="https://studies-de-jure.gitbook.io/learn/">← Back to sourcebook</a></div></header>
+
 
 <h1 id="remarkise">Remarkise</h1>
 <p>Render your <a href="http://commonmark.org/">markdown</a> as <a href="https://github.com/tripu/remark">remark</a> slides — in real time</p>
@@ -128,6 +230,223 @@
 	<script type="text/javascript" src="https://use.fontawesome.com/84b10e0f37.js"></script>
 	<script src="https://kit.fontawesome.com/312924c174.js" crossorigin="anonymous"></script>
 </div>
+ <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/notes/notes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+
+  <script>
+    /*******************************
+     * STORAGE KEYS
+     *******************************/
+    const KEY_HISTORY = "ldt_history";      // array of { fromId, fromLabel, choice, toId, toLabel }
+    const KEY_LAST_ROUTE = "ldt_last_route"; // { fromId, choice, toId }
+
+    function loadHistory() {
+      try { return JSON.parse(sessionStorage.getItem(KEY_HISTORY)) ?? []; }
+      catch { return []; }
+    }
+    function saveHistory(hist) {
+      sessionStorage.setItem(KEY_HISTORY, JSON.stringify(hist));
+    }
+    function setLastRoute(route) {
+      sessionStorage.setItem(KEY_LAST_ROUTE, JSON.stringify(route));
+    }
+    function getLastRoute() {
+      try { return JSON.parse(sessionStorage.getItem(KEY_LAST_ROUTE)); }
+      catch { return null; }
+    }
+
+    /*******************************
+     * MERMAID + REVEAL INIT
+     *******************************/
+    mermaid.initialize({ startOnLoad: false, securityLevel: "loose" });
+
+    const deck = new Reveal({
+      hash: true,
+      plugins: [ RevealNotes ]
+    });
+
+    deck.initialize().then(() => {
+      renderMermaidVisible();
+      updateUIForSlide(deck.getCurrentSlide());
+      renderBreadcrumbs();
+      applyAutoHighlight(deck.getCurrentSlide());
+    });
+
+    deck.on("slidechanged", (ev) => {
+      renderMermaidVisible();
+      updateUIForSlide(ev.currentSlide);
+      renderBreadcrumbs();
+      applyAutoHighlight(ev.currentSlide);
+    });
+
+    function renderMermaidVisible() {
+      // Render Mermaid blocks on the current slide only (fast + reliable).
+      const slide = deck.getCurrentSlide();
+      if (!slide) return;
+
+      const blocks = slide.querySelectorAll("pre.mermaid:not([data-rendered='true'])");
+      blocks.forEach(async (block) => {
+        const code = block.textContent;
+        const id = "mmd_" + Math.random().toString(16).slice(2);
+
+        try {
+          const { svg } = await mermaid.render(id, code);
+          const container = document.createElement("div");
+          container.innerHTML = svg;
+
+          block.replaceWith(container);
+          container.setAttribute("data-rendered", "true");
+        } catch (e) {
+          console.error("Mermaid render error:", e);
+        }
+      });
+    }
+
+    /*******************************
+     * DECISION ROUTER (Y/N + buttons)
+     *******************************/
+    const btnYes = document.getElementById("btnYes");
+    const btnNo  = document.getElementById("btnNo");
+    const btnBack = document.getElementById("btnBack");
+
+    btnYes.addEventListener("click", () => route("yes"));
+    btnNo.addEventListener("click", () => route("no"));
+    btnBack.addEventListener("click", () => goBackToLastDecision());
+
+    document.addEventListener("keydown", (ev) => {
+      const k = ev.key.toLowerCase();
+      if (k === "y") { ev.preventDefault(); route("yes"); }
+      if (k === "n") { ev.preventDefault(); route("no"); }
+      if (k === "b") { ev.preventDefault(); goBackToLastDecision(); }
+    }, true);
+
+    function isDecisionSlide(slide) {
+      if (!slide) return false;
+      if (slide.dataset.ynDisabled === "true") return false;
+      return !!(slide.dataset.yes && slide.dataset.no);
+    }
+
+    function updateUIForSlide(slide) {
+      const decision = isDecisionSlide(slide);
+      btnYes.disabled = !decision;
+      btnNo.disabled  = !decision;
+
+      // Back is enabled if there is at least one breadcrumb entry.
+      btnBack.disabled = loadHistory().length === 0;
+    }
+
+    function getSlideLabelById(id) {
+      const el = document.getElementById(id);
+      if (!el) return id;
+      return el.dataset.label || id;
+    }
+
+    function route(choice) {
+      const slide = deck.getCurrentSlide();
+      if (!isDecisionSlide(slide)) return;
+
+      const fromId = slide.id;
+      const fromLabel = slide.dataset.label || fromId;
+
+      const toId = (choice === "yes") ? slide.dataset.yes : slide.dataset.no;
+      if (!toId || !document.getElementById(toId)) return;
+
+      const toLabel = getSlideLabelById(toId);
+
+      // Persist route + breadcrumbs
+      const hist = loadHistory();
+      hist.push({ fromId, fromLabel, choice, toId, toLabel });
+      saveHistory(hist);
+
+      setLastRoute({ fromId, choice, toId });
+
+      // Navigate by id (Reveal hash navigation)
+      window.location.hash = "#/" + toId;
+    }
+
+    /*******************************
+     * BREADCRUMBS / HISTORY
+     *******************************/
+    function renderBreadcrumbs() {
+      const bc = document.getElementById("breadcrumbs");
+      const hist = loadHistory();
+
+      // Always show a small header (useful for students)
+      bc.innerHTML = "";
+
+      const title = document.createElement("span");
+      title.style.fontWeight = "600";
+      title.textContent = "Path:";
+      bc.appendChild(title);
+
+      if (hist.length === 0) {
+        const empty = document.createElement("span");
+        empty.style.opacity = "0.7";
+        empty.style.marginLeft = "0.5rem";
+        empty.textContent = "—";
+        bc.appendChild(empty);
+        return;
+      }
+
+      hist.forEach((h) => {
+        const pill = document.createElement("span");
+        pill.className = "crumb";
+        pill.textContent = h.fromLabel;
+
+        const ch = document.createElement("span");
+        ch.className = "choice";
+        ch.textContent = (h.choice === "yes") ? "Y" : "N";
+        pill.appendChild(ch);
+
+        bc.appendChild(pill);
+      });
+    }
+
+    /*******************************
+     * BACK TO LAST DECISION (B)
+     *******************************/
+    function goBackToLastDecision() {
+      const hist = loadHistory();
+      if (hist.length === 0) return;
+
+      const last = hist.pop();     // remove last branch decision
+      saveHistory(hist);           // persist new history
+      sessionStorage.removeItem(KEY_LAST_ROUTE); // clear route highlight intent
+
+      // Navigate back to the decision slide we branched from
+      if (last?.fromId && document.getElementById(last.fromId)) {
+        window.location.hash = "#/" + last.fromId;
+      }
+
+      renderBreadcrumbs();
+      btnBack.disabled = hist.length === 0;
+    }
+
+    /*******************************
+     * AUTO-HIGHLIGHT CHOSEN BRANCH
+     *******************************/
+    function applyAutoHighlight(slide) {
+      if (!slide) return;
+
+      // Clear prior highlight classes on this slide
+      slide.classList.remove("chosen-yes", "chosen-no");
+
+      // If we arrived here from a decision via Y/N, highlight accordingly
+      const route = getLastRoute();
+      if (!route) return;
+
+      if (route.toId !== slide.id) return;
+
+      if (route.choice === "yes") slide.classList.add("chosen-yes");
+      if (route.choice === "no")  slide.classList.add("chosen-no");
+
+      // Important: keep last route so subsequent non-decision navigation still reflects arrival.
+      // If you want highlight to apply only once, uncomment:
+      // sessionStorage.removeItem(KEY_LAST_ROUTE);
+    }
+  </script>
 </body>
 </html>
 <p>Toggle presenter mode</p>
