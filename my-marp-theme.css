@@ -1,0 +1,46 @@
+/* @theme my-marp-theme */
+section {
+    font-family: system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-size: 30px;
+    color: #151515;
+    background-color: #fffdfa;
+    padding: 100px;
+    text-align: left;
+    justify-content: flex-start;
+  }
+  section h1, section h2, section h3 { font-family: system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; text-align: left; margin-top: 0; }
+  section h1 { font-size: 60px; color: #0b4779; margin-bottom: 0.4em; }
+  section h2 { font-size: 40px;color: #004a86; margin-bottom: 0.4em; }
+  section h3 { font-size: 35px; }
+  section a { color: #1d4ed8; }
+  section strong { color: #016812; }
+  section table { font-size: 18px; }
+  section pre, section code { font-size: 17px; }
+  section code { font-size: 0.9em; }
+  section pre code { font-size: 1em; }
+  header, footer { color: #737373; font-size: 13px; }
+  section::after { color: #737373; font-size: 13px; right: 48px; }
+
+  /* <!-- _class: lead --> */
+  section.lead { justify-content: center; text-align: center; }
+  section.lead h1, section.lead h2, section.lead p { text-align: center; }
+
+  /* <!-- _class: divider --> */
+  section.divider { justify-content: center; }
+  section.divider h1 { font-size: 60px; text-align: center; }
+
+  /* <div class="columns"><div class="column">…</div><div class="column">…</div></div> */
+  .columns { display: flex; gap: 29px; }
+  .column { flex: 1; min-width: 0; }
+  .columns-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+
+  .box { border: 1px solid #73737355; border-radius: 8px; padding: 0.6em 0.9em; margin: 0.6em 0; }
+  .highlight { background: #1d4ed822; color: #1d4ed8; padding: 0.05em 0.35em; border-radius: 4px; font-weight: bold; }
+
+  /* <span class="source">Author, year, page</span> */
+  .source { position: absolute; left: 48px; bottom: 43px; font-size: 13px; color: #737373; }
+
+  /* <!-- _class: invert --> */
+  section.invert { color: #ffffff; background-color: #151515; }
+  section.invert h1 { color: #ffffff; }
+  section.invert header, section.invert footer, section.invert::after, section.invert .source { color: #ffffffaa; }

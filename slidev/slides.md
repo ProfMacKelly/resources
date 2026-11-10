@@ -89,7 +89,106 @@ flowchart TB
 </Transform>
 
 ---
+routeAlias: breach
 ---
+
+# Element 2: Breach
+
+Did D breach the duty to P?
+
+<div class="flex gap-6 mt-10 justify-center">
+  <Link
+    to="causation"
+    class="px-8 py-4 rounded-lg bg-green-600 text-white font-bold text-xl"
+  >
+    Yes
+  </Link>
+
+  <Link
+    to="not_liable"
+    class="px-8 py-4 rounded-lg bg-red-600 text-white font-bold text-xl"
+  >
+    No
+  </Link>
+</div>
+
+---
+
+blank
+
+---
+# Element 3: Causation
+
+Did the defendant's breach cause harm?
+
+<div class="flex gap-6 mt-10 justify-center">
+  <Link
+    to="damages"
+    class="px-8 py-4 rounded-lg bg-green-600 text-white font-bold text-xl"
+  >
+    Yes
+  </Link>
+
+  <Link
+    to="not_liable"
+    class="px-8 py-4 rounded-lg bg-red-600 text-white font-bold text-xl"
+  >
+    No
+  </Link>
+</div>
+
+---
+
+
+---
+
+sdfgsdfgsdfg
+
+---
+
+
+---
+
+
+# What are the damages?
+
+Calculate claimed damages.
+
+<div class="flex gap-6 mt-10 justify-center">
+  <Link
+    to="causation"
+    class="px-8 py-4 rounded-lg bg-green-600 text-white font-bold text-xl"
+  >
+    Yes
+  </Link>
+
+  <Link
+    to="not_liable"
+    class="px-8 py-4 rounded-lg bg-red-600 text-white font-bold text-xl"
+  >
+    No
+  </Link>
+</div>
+
+---
+
+routeAlias: liable
+class: text-center
+---
+
+# Outcome
+
+D is liable for negligence.
+
+---
+
+routeAlias: not_liable
+class: text-center
+---
+
+# Outcome
+
+D is not liable for negligence.
 
 ---
 class: -mt-5
@@ -207,17 +306,7 @@ D is not liable for negligence.
 
 
 ---
-class: text-center
-routeAlias: liable
----
-
-# Outcome
-
-D is liable for negligence.
-
-
----
-routeAlias: breach
+routeAlias: causation
 decision: true
 question: "Breach?"
 yesTarget: causation
@@ -253,7 +342,7 @@ graph TD
     style Q3 stroke-width:4px,stroke:#4ade80
 ```
 ---
-routeAlias: damages
+routeAlias: damagesx
 decision: true
 question: "Damages?"
 yesTarget: liable

@@ -1,0 +1,17 @@
+flowchart TB
+Y[Start]--> 1
+  subgraph 1["I. Unprotected Categories"]
+    A["Action by gov't or by someone in conjunction w/ the gov't?"]
+    B["Action substantially affect a legal right or ability to express themselves?"]
+    C["Not a Free Speech issue"]
+  end
+    
+1-->A
+A-- Yes -->B
+A-- No -->C
+    style A stroke:#0351CE,fill:#F1F3FF
+    style Y stroke:#0351CE,fill:#F1F3FF
+    style B stroke:#FF001A,fill:#FFE6E8
+    style C stroke:#00C20A,fill:#EDF7EE
+
+    
