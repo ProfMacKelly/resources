@@ -23,34 +23,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.29.2
-
-      - name: Install dependencies
-        run: pnpm -C slidev install --frozen-lockfile
-
-      - name: Ensure lockfile did not change
-        run: |
-          git status --porcelain
-          git diff --exit-code -- slidev/pnpm-lock.yaml
-      - name: Build Slidev
-        run: pnpm -C slidev exec slidev build --base /resources/slidev/
-
       - name: Assemble website
         run: |
           mkdir -p _site
-          git archive HEAD | tar -x -C _site --exclude='.github' --exclude='.vscode' --exclude='slidev'
-          cp -a slidev/dist _site/slidev
+          git archive HEAD | tar -x -C _site --exclude='.github' --exclude='.vscode'
 
       - name: Verify website entry points
         run: |
           cmp index.html _site/index.html
-          test -f _site/slidev/index.html
           test -f _site/decsion_tree_template.html
 
       - name: Setup Pages
